@@ -1,0 +1,139 @@
+[
+    {
+        "id": "389593fb03e2e852",
+        "type": "inject",
+        "z": "6f14455812d3c869",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "test",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 80,
+        "wires": [
+            [
+                "9bb8d60d1169b131"
+            ]
+        ]
+    },
+    {
+        "id": "990395f669d35bc2",
+        "type": "function",
+        "z": "6f14455812d3c869",
+        "name": "function 7",
+        "func": "msg.config_url = msg.payload;\nlet endpointConfigs = msg.payload.map(x => {\n    let { mac_address, url, username, password } = x\n    let auth = {\n        auth_mode: \"standard\",\n        username,\n        password,\n    }\n    let mac = mac_address\n    let urls = {\n        sysinfo: url + \"cgi-bin/sysinfo.lua\",\n        login: url + \"cgi-bin/login.lua\",\n        stream: url + \"cgi-bin/stream.lua\",\n        getsetup: url + \"cgi-bin/getsetup.lua\"\n    }\n    return { mac, host: url, urls, auth }\n})\nmsg.payload = {\n    endpointConfigs,\n    setEnableAll: true,\n    setGetsysinfoAll: true,\n    setGetsetupAll: true,\n    processesLimited: 20,\n    requestTimeout: 20000\n}\nmsg.action = \"changeSetting\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 80,
+        "wires": [
+            [
+                "8ef3758d00e718a3"
+            ]
+        ]
+    },
+    {
+        "id": "65970a0fbb2ea82a",
+        "type": "mongodb4",
+        "z": "6f14455812d3c869",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 370,
+        "y": 80,
+        "wires": [
+            [
+                "990395f669d35bc2"
+            ]
+        ]
+    },
+    {
+        "id": "9bb8d60d1169b131",
+        "type": "function",
+        "z": "6f14455812d3c869",
+        "name": "query",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    _id: {\n        $type: 'objectId'\n    }\n}\nmsg.sort = {\n    _id: 1\n};\n\nmsg.limit = 20;\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "65970a0fbb2ea82a"
+            ]
+        ]
+    },
+    {
+        "id": "8ef3758d00e718a3",
+        "type": "debug",
+        "z": "6f14455812d3c869",
+        "name": "debug 25",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "E:/2025/MongoDBAtlasCert/mongodb-atlas-X509-cert-6554658675322995379.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "a47393767516e226",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-mongodb4": "3.4.0"
+        }
+    }
+]

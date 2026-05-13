@@ -1,0 +1,901 @@
+[
+    {
+        "id": "63314ec708b215e1",
+        "type": "group",
+        "z": "72deba9627bede6d",
+        "name": "store management",
+        "style": {
+            "stroke": "#92d04f",
+            "label": true,
+            "color": "#c8e7a7"
+        },
+        "nodes": [
+            "23b245be20727cbe",
+            "4fedbc2e5bfc6e8d",
+            "f98c9f845d5dddbb",
+            "66e50fe86c623fb6",
+            "66b43b1adf6d2f20",
+            "d55dbbc7b07050b5",
+            "c45f7144445e5b54",
+            "74a3c96b151a54b1",
+            "fd1862583c4a2882",
+            "228729c8a360ec1d",
+            "cb5e28f3452d30c5",
+            "d5ca3576edd185df",
+            "67be6236453c2d3e",
+            "00cc4d4abf68e36f",
+            "624bc7022aa99e5d",
+            "310e744fdee8168c",
+            "114db914898085f4",
+            "0d31484f23f92a11"
+        ],
+        "x": 34,
+        "y": 539,
+        "w": 2112,
+        "h": 242
+    },
+    {
+        "id": "100e189dadb670c8",
+        "type": "subflow",
+        "name": "JWT Verify",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 200,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "773adfc957a60053"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 520,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "773adfc957a60053",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "773adfc957a60053",
+        "type": "function",
+        "z": "100e189dadb670c8",
+        "name": "JWT Verify",
+        "func": "const authHeader = msg.req.headers.authorization;\nif (!authHeader || !authHeader.startsWith(\"Bearer \")) {\n    msg.payload = { error: \"Missing or malformed Authorization header\" }\n    return msg;\n}\n\nconst token = authHeader.split(\" \")[1].replace(/^\"+|\"+$/g, '');\nconst secretKey = env.get(\"JWT\");\n\ntry {\n    const decoded = jwt.verify(token, secretKey);\n    msg.payload = decoded;\n    msg.jwt = decoded;\n} catch (err) {\n    msg.payload = { error: err.message }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "jwt",
+                "module": "jsonwebtoken"
+            }
+        ],
+        "x": 370,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "23b245be20727cbe",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "store_info",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    _id: {\n        $type: 'objectId'\n    }\n}\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1540,
+        "y": 580,
+        "wires": [
+            [
+                "d5ca3576edd185df"
+            ]
+        ]
+    },
+    {
+        "id": "4fedbc2e5bfc6e8d",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "url": "/api/xcenter/v1/store_info",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 620,
+        "wires": [
+            [
+                "d55dbbc7b07050b5"
+            ]
+        ]
+    },
+    {
+        "id": "f98c9f845d5dddbb",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "response",
+        "func": "\nmsg.payload || [];\n\nswitch (msg.endpoint_type) {\n    case \"store_info\":\n        msg.payload = msg.payload.length > 0 ? msg.payload = { status: 200, message: \"ok\", data: msg.payload } : msg.payload = { status: 404, message: \"Not Found!\" };\n        break;\n    case \"added\":\n        msg.payload = msg.payload.acknowledged ? msg.payload = { status: 200, message: \"ok\" } : msg.payload = { status: 400, message: \"Bad Request!\" }\n        break;\n    case \"updated\" || \"deleted\":\n        msg.payload = msg.payload.acknowledged ? msg.payload = { status: 200, message: \"ok\" } : msg.payload = { status: 400, message: \"Bad Request!\" }\n        break;\n    default:\n        break;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1920,
+        "y": 640,
+        "wires": [
+            [
+                "66e50fe86c623fb6"
+            ]
+        ]
+    },
+    {
+        "id": "66e50fe86c623fb6",
+        "type": "http response",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 2070,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "66b43b1adf6d2f20",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "url": "/api/xcenter/v1/store_info/added",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 660,
+        "wires": [
+            [
+                "d55dbbc7b07050b5"
+            ]
+        ]
+    },
+    {
+        "id": "d55dbbc7b07050b5",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "split headers",
+        "func": "let text = msg.req.originalUrl;\nlet split_text = text.split(\"/\").reverse()[0];\nmsg.group_type = \"store_info\";\nmsg.endpoint_type = split_text;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 640,
+        "wires": [
+            [
+                "0d31484f23f92a11"
+            ]
+        ]
+    },
+    {
+        "id": "c45f7144445e5b54",
+        "type": "switch",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "TYPE",
+        "property": "endpoint_type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "store_info",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "added",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "updated",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "deleted",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1390,
+        "y": 640,
+        "wires": [
+            [
+                "23b245be20727cbe"
+            ],
+            [
+                "310e744fdee8168c"
+            ],
+            [
+                "fd1862583c4a2882"
+            ],
+            [
+                "cb5e28f3452d30c5"
+            ]
+        ]
+    },
+    {
+        "id": "74a3c96b151a54b1",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "url": "/api/xcenter/v1/store_info/updated",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 700,
+        "wires": [
+            [
+                "d55dbbc7b07050b5"
+            ]
+        ]
+    },
+    {
+        "id": "fd1862583c4a2882",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "updated",
+        "func": "let payload = msg.req.body;\ndelete payload._id;\n\npayload.url = payload.external_ip;\n\nconst { lastModified, createdAt, ...updateFields } = payload;\n\nconst upsert = { upsert: true };\nconst filter = { id: payload.id, mac_address: payload.mac_address, branch_id: payload.branch_id };\nconst data = {\n    $set: updateFields,\n    $currentDate: {\n        lastModified: true\n    }\n}\n\nconst query = [filter, data, upsert];\nmsg.payload = query;\nmsg.collection = \"endpoints\";\nmsg.operation = \"updateOne\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1540,
+        "y": 660,
+        "wires": [
+            [
+                "d5ca3576edd185df"
+            ]
+        ]
+    },
+    {
+        "id": "228729c8a360ec1d",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "url": "/api/xcenter/v1/store_info/deleted",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 740,
+        "wires": [
+            [
+                "d55dbbc7b07050b5"
+            ]
+        ]
+    },
+    {
+        "id": "cb5e28f3452d30c5",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "deleted",
+        "func": "const payload = msg.req.body;\nmsg.collection = \"endpoints\";\nmsg.payload = { mac_address: payload.mac }\nmsg.operation = \"deleteOne\";\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "0",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1540,
+        "y": 700,
+        "wires": [
+            [
+                "d5ca3576edd185df"
+            ]
+        ]
+    },
+    {
+        "id": "d5ca3576edd185df",
+        "type": "mongodb4",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core endpoints",
+        "x": 1750,
+        "y": 640,
+        "wires": [
+            [
+                "f98c9f845d5dddbb",
+                "114db914898085f4"
+            ]
+        ]
+    },
+    {
+        "id": "67be6236453c2d3e",
+        "type": "comment",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "Store Info",
+        "info": "",
+        "x": 200,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "00cc4d4abf68e36f",
+        "type": "switch",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "group type",
+        "property": "group_type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "store_info",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "data",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "alarms",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 1090,
+        "y": 640,
+        "wires": [
+            [
+                "c45f7144445e5b54"
+            ],
+            [
+                "fddd06a3a497cbd1"
+            ],
+            [
+                "624bc7022aa99e5d"
+            ]
+        ]
+    },
+    {
+        "id": "624bc7022aa99e5d",
+        "type": "link out",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "to alarm",
+        "mode": "link",
+        "links": [],
+        "x": 1235,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "310e744fdee8168c",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "added",
+        "func": "let payload = msg.req.body;\ndelete payload._id;\npayload.url = payload.external_ip;\nconst upsert = { upsert: true };\nconst filter = { id: payload.id, mac_address: payload.mac_address, branch_id: payload.branch_id, url: payload.external_ip };\nconst data = {\n    $set: payload,\n    $currentDate: {\n        lastModified: true\n    },\n    $setOnInsert: {\n        createdAt: new Date(),\n    }\n}\n\nconst query = [filter, data, upsert];\nmsg.payload = query;\nmsg.collection = \"endpoints\";\nmsg.operation = \"updateOne\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1530,
+        "y": 620,
+        "wires": [
+            [
+                "d5ca3576edd185df"
+            ]
+        ]
+    },
+    {
+        "id": "114db914898085f4",
+        "type": "switch",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "property": "endpoint_type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "added",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1910,
+        "y": 700,
+        "wires": [
+            [
+                "37dd1b20be544c12"
+            ]
+        ]
+    },
+    {
+        "id": "0d31484f23f92a11",
+        "type": "subflow:100e189dadb670c8",
+        "z": "72deba9627bede6d",
+        "g": "63314ec708b215e1",
+        "name": "",
+        "x": 910,
+        "y": 640,
+        "wires": [
+            [
+                "00cc4d4abf68e36f"
+            ]
+        ]
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "bfbf1b5651610dad",
+        "type": "group",
+        "z": "72deba9627bede6d",
+        "name": "",
+        "style": {
+            "stroke": "#0070c0",
+            "label": true,
+            "color": "#c8e7a7"
+        },
+        "nodes": [
+            "e4b0f9fbe2b596d8",
+            "95cf2e1419f044ce",
+            "1ec510a233a36cfd",
+            "2b76253ee3833213",
+            "b5fbbc5abfa48247",
+            "7aa122d72de76bc2",
+            "4fcb7d1ccae9dad5",
+            "f53d0d62f9fcb9f1",
+            "b3b9a7a738eab6a3",
+            "8bf96806e535174d",
+            "5fd82f9323ee37e4",
+            "afcbe69ba02f9bfe",
+            "fddd06a3a497cbd1",
+            "0bf65d6d66ef48d0",
+            "3c70807d8ab016c5",
+            "cfef894e936503f9"
+        ],
+        "x": 34,
+        "y": 819,
+        "w": 1552,
+        "h": 202
+    },
+    {
+        "id": "e4b0f9fbe2b596d8",
+        "type": "comment",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "Request Data",
+        "info": "",
+        "x": 210,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "95cf2e1419f044ce",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "",
+        "url": "/api/xcenter/v1/data",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 940,
+        "wires": [
+            [
+                "5fd82f9323ee37e4"
+            ]
+        ]
+    },
+    {
+        "id": "1ec510a233a36cfd",
+        "type": "http response",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1510,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "2b76253ee3833213",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "",
+        "url": "/api/xcenter/v1/data/rawData",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 900,
+        "wires": [
+            [
+                "b3b9a7a738eab6a3"
+            ]
+        ]
+    },
+    {
+        "id": "b5fbbc5abfa48247",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "Raw Data",
+        "func": "msg.collection = \"data_all_entire\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 980,
+        "wires": [
+            [
+                "7aa122d72de76bc2"
+            ]
+        ]
+    },
+    {
+        "id": "7aa122d72de76bc2",
+        "type": "mongodb4",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "rawData",
+        "x": 1120,
+        "y": 980,
+        "wires": [
+            [
+                "0bf65d6d66ef48d0"
+            ]
+        ]
+    },
+    {
+        "id": "4fcb7d1ccae9dad5",
+        "type": "http in",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "",
+        "url": "/api/xcenter/v1/dataElement",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 980,
+        "wires": [
+            [
+                "8bf96806e535174d"
+            ]
+        ]
+    },
+    {
+        "id": "f53d0d62f9fcb9f1",
+        "type": "change",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "g data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "group_type",
+                "pt": "msg",
+                "to": "data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 880,
+        "wires": [
+            [
+                "0d31484f23f92a11"
+            ]
+        ]
+    },
+    {
+        "id": "b3b9a7a738eab6a3",
+        "type": "change",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "endpoint rawData",
+        "rules": [
+            {
+                "t": "set",
+                "p": "endpoint_type",
+                "pt": "msg",
+                "to": "rawData",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 900,
+        "wires": [
+            [
+                "f53d0d62f9fcb9f1"
+            ]
+        ]
+    },
+    {
+        "id": "8bf96806e535174d",
+        "type": "change",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "endpoint dataElement",
+        "rules": [
+            {
+                "t": "set",
+                "p": "endpoint_type",
+                "pt": "msg",
+                "to": "dataElement",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 980,
+        "wires": [
+            [
+                "f53d0d62f9fcb9f1"
+            ]
+        ]
+    },
+    {
+        "id": "5fd82f9323ee37e4",
+        "type": "change",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "endpoint data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "endpoint_type",
+                "pt": "msg",
+                "to": "data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 940,
+        "wires": [
+            [
+                "f53d0d62f9fcb9f1"
+            ]
+        ]
+    },
+    {
+        "id": "afcbe69ba02f9bfe",
+        "type": "inject",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "every 3m",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "mbdata",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "repeat": "180",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 830,
+        "y": 980,
+        "wires": [
+            [
+                "b5fbbc5abfa48247"
+            ]
+        ]
+    },
+    {
+        "id": "fddd06a3a497cbd1",
+        "type": "switch",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "TYPE",
+        "property": "endpoint_type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "dataElement",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 950,
+        "y": 880,
+        "wires": [
+            [
+                "cfef894e936503f9"
+            ],
+            [
+                "3c70807d8ab016c5"
+            ]
+        ]
+    },
+    {
+        "id": "0bf65d6d66ef48d0",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "Cache Result",
+        "func": "\nif (msg.mbdata) {\n    context.set(\"rawData\", msg.payload); //tn:\n    return null;\n}\n\nif (msg.topic == \"get\") {\n    let data = context.get(\"rawData\");\n    if (msg.mac) {\n        let perStore = data.filter(fil => fil.mac === msg.mac);\n        msg.payload = perStore.length > 0 ? { status: 200, message: \"ok\", data: perStore[0] } : { status: 204, message: \"No Content\" }\n    } else {\n        msg.payload = data !== undefined ? { status: 200, message: \"ok\", data } : { status: 204, message: \"No Content\" } //tn:\n    }\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1340,
+        "y": 880,
+        "wires": [
+            [
+                "1ec510a233a36cfd"
+            ]
+        ]
+    },
+    {
+        "id": "3c70807d8ab016c5",
+        "type": "change",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "rawData & data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "get",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1120,
+        "y": 920,
+        "wires": [
+            [
+                "0bf65d6d66ef48d0"
+            ]
+        ]
+    },
+    {
+        "id": "cfef894e936503f9",
+        "type": "function",
+        "z": "72deba9627bede6d",
+        "g": "bfbf1b5651610dad",
+        "name": "MAC: per store",
+        "func": "msg.mac = msg.req.query.mac;\nmsg.topic = \"get\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 860,
+        "wires": [
+            [
+                "0bf65d6d66ef48d0"
+            ]
+        ]
+    }
+]

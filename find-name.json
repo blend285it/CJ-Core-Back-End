@@ -1,0 +1,120 @@
+[
+    {
+        "id": "24fc7aaa453f0c17",
+        "type": "function",
+        "z": "53cec00296c2a495",
+        "name": "endpoints",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    xweb_name: {\n        $not: /[\\u0E00-\\u0E7F]/\n    }\n};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 1060,
+        "wires": [
+            [
+                "4b11435300f6999e"
+            ]
+        ]
+    },
+    {
+        "id": "4b11435300f6999e",
+        "type": "mongodb4",
+        "z": "53cec00296c2a495",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "endpoints",
+        "x": 540,
+        "y": 1060,
+        "wires": [
+            [
+                "db5ee4f7615a60f2"
+            ]
+        ]
+    },
+    {
+        "id": "763533ba1f647fbc",
+        "type": "inject",
+        "z": "53cec00296c2a495",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1060,
+        "wires": [
+            [
+                "24fc7aaa453f0c17"
+            ]
+        ]
+    },
+    {
+        "id": "db5ee4f7615a60f2",
+        "type": "debug",
+        "z": "53cec00296c2a495",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "E:/2025/MongoDBAtlasCert/mongodb-atlas-X509-cert-6554658675322995379.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "2b44c56c8b956ff4",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-mongodb4": "3.4.0"
+        }
+    }
+]

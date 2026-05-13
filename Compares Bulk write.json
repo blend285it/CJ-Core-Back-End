@@ -1,0 +1,48 @@
+[
+    {
+        "id": "e5ebba7860b935f1",
+        "type": "function",
+        "z": "add29a54d121bc7e",
+        "name": "Normalize/Validate",
+        "func": "if (!Array.isArray(msg.payload)) {\n    node.error(\"payload is NOT array\", msg.payload);\n    return null;\n}\n\nfunction deepClean(obj) {\n    return JSON.parse(JSON.stringify(obj));\n}\n\n/* Protected of Mongodb Error($, .) */\nfunction sanitizeKeys(obj) {\n    if (Array.isArray(obj)) {\n        return obj.map(sanitizeKeys);\n    }\n\n    if (obj && typeof obj === \"object\") {\n        const clean = {};\n        for (const [k, v] of Object.entries(obj)) {\n            if (k.startsWith(\"$\") || k.includes(\".\")) continue;\n            clean[k] = sanitizeKeys(v);\n        }\n        return clean;\n    }\n    return obj;\n}\n\nconst BATCH_SIZE = 200;\nconst ops = [];\n\nfor (const item of msg.payload) {\n    const mac = item?.mac || item?._attr?.mac;\n    if (!mac) continue;\n\n    const rawData = item.data ?? item;\n    const safeData = sanitizeKeys(deepClean(rawData));\n\n    ops.push({\n        updateOne: {\n            filter: { mac },\n            update: {\n                $set: {\n                    mac,\n                    ...safeData\n                },\n                $currentDate: { lastModified: true },\n            },\n            upsert: true,\n        }\n    })\n}\n\nif (ops.length === 0) return null;\n\n/* แยก batch -> 1 msg = 1 bulkWrite */\nconst messages = [];\nfor (let i = 0; i < ops.length; i += BATCH_SIZE) {\n    messages.push({\n        collection: \"alarms_aggregate\",\n        operation: \"bulkWrite\",\n        payload: ops.slice(i, i + BATCH_SIZE),\n        options: { ordered: false }\n    })\n}\nconst now = new Date();\nnode.status({\n    fill: \"green\",\n    shape: \"dot\",\n    text: `BulkWrite ${messages.length} batch(es) @ ${now.toLocaleString(\"en-GB\", {\n        timeZone: \"Asia/Bangkok\",\n        hour12: false\n    })}`\n});\n\nreturn [messages];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "MongoDB",
+                "module": "mongodb"
+            }
+        ],
+        "x": 670,
+        "y": 380,
+        "wires": [
+            [
+                "45300bf0081504fb"
+            ]
+        ]
+    },
+    {
+        "id": "4de0c821cc20362b",
+        "type": "function",
+        "z": "add29a54d121bc7e",
+        "name": "Buffer bulkWrite ops",
+        "func": "const BATCH_SIZE = 100;\nconst item = msg.payload || {};\n\nfunction stat(name, n = 1) {\n    const s = flow.get(\"agg_only_stats\") || {};\n    s[name] = (s[name] || 0) + n;\n    s.lastMsgAt = Date.now();\n    flow.set(\"agg_only_stats\", s);\n}\n\nlet dataAllBuffer = flow.get(\"agg_only_data_all_buffer\") || [];\nlet alarmBuffer = flow.get(\"agg_only_alarm_buffer\") || [];\n\nif (item.dataAll) {\n    dataAllBuffer.push(item.dataAll);\n    stat(\"dataAllOps\");\n}\n\nif (item.alarmAggregate) {\n    alarmBuffer.push(item.alarmAggregate);\n    stat(\"alarmOps\");\n}\n\nconst messages = [];\n\nif (dataAllBuffer.length >= BATCH_SIZE) {\n    messages.push({\n        collection: \"data_all\",\n        operation: \"bulkWrite\",\n        payload: dataAllBuffer.splice(0, BATCH_SIZE),\n        options: { ordered: false },\n        topic: \"bulkWrite:data_all\"\n    });\n    stat(\"dataAllBatches\");\n}\n\nif (alarmBuffer.length >= BATCH_SIZE) {\n    messages.push({\n        collection: \"alarms_aggregate\",\n        operation: \"bulkWrite\",\n        payload: alarmBuffer.splice(0, BATCH_SIZE),\n        options: { ordered: false },\n        topic: \"bulkWrite:alarms_aggregate\"\n    });\n    stat(\"alarmBatches\");\n}\n\nflow.set(\"agg_only_data_all_buffer\", dataAllBuffer);\nflow.set(\"agg_only_alarm_buffer\", alarmBuffer);\n\n// ส่งออกหลาย msg ใน output เดียว\nif (messages.length > 0) {\n    return [messages];\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 240,
+        "wires": [
+            [
+                "f09658132f14a888",
+                "4b6c5cf3660ce15e"
+            ]
+        ]
+    }
+]

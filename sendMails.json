@@ -1,0 +1,145 @@
+[
+  {
+    "id": "cec1abc0.27f078",
+    "type": "function",
+    "z": "229e2430.f4e9fc",
+    "name": "Test 1",
+    "func": "let from = new Date()\nlet to = new Date()\n\nfrom.setDate((from.getDate() - 7))\nfrom.setHours(8)\nfrom.setMinutes(0)\nfrom.setSeconds(0)\n\nto.setHours(8)\nto.setMinutes(1)\nto.setSeconds(0)\n\nmsg.from = (Date.parse(from) / 1000);\nmsg.to =  (Date.parse(to) / 1000);\nmsg.headers = {\n    \"Cookie\": \"fileDownload=true\"\n},\n\nmsg.request = {}\nmsg.request.options = {\n    timeout : 999999\n}\n\nmsg.url = 'http://192.168.0.150/cgi-bin/exportdata.cgi?SSES=dummy=XLSX&source=m&ds=' + msg.from + '&de=' + msg.to + '&int=120&udtf=0&o0=OUT&d0=1,1,44,45&d1=2,1,44,45&d2=3,1,29,30&d3=4,1,44,45&d4=5,1,44,45&d5=6,1,29,30&d6=7,1,44,45&d7=8,1,44,45&d8=9,1,29,30&d9=10,1,44,45&d10=11,1,44,45&d11=12,1,29,30&d12=13,1,44,45&d13=14,1,44,45&d14=15,1,29,30&d15=16,1,44,45&d16=17,1,44,45&d17=18,1,44,45&d18=19,1,29,30&d19=20,1,44,45&d20=21,1,44,45&d21=22,1,29,30&d22=23,1,44,45&d23=24,1,44,45&d24=25,1,29,30&d25=26,1,44,45&d26=27,1,44,45&d27=28,1,29,30&d28=29,1,44,45&d29=30,1,44,45&d30=31,1,29,30&d31=32,1,44,45&d32=33,1,44,45&d33=34,1,29,30&d34=35,1,44,45&d35=36,1,44,45&d36=37,1,29,30&ln=en-GB'\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 1650,
+    "y": 640,
+    "wires": [
+      [
+        "155655b9.629d9a"
+      ]
+    ]
+  },
+  {
+    "id": "e20d173e.c47258",
+    "type": "inject",
+    "z": "229e2430.f4e9fc",
+    "name": "Test Inject 2",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 1500,
+    "y": 640,
+    "wires": [
+      [
+        "cec1abc0.27f078"
+      ]
+    ]
+  },
+  {
+    "id": "155655b9.629d9a",
+    "type": "www-request",
+    "z": "229e2430.f4e9fc",
+    "name": "",
+    "method": "GET",
+    "ret": "bin",
+    "url": "",
+    "follow-redirects": true,
+    "persistent-http": true,
+    "tls": "",
+    "x": 1830,
+    "y": 640,
+    "wires": [
+      [
+        "2db8c8c1.a3ce08",
+        "1415d040.b2c05"
+      ]
+    ]
+  },
+  {
+    "id": "2db8c8c1.a3ce08",
+    "type": "switch",
+    "z": "229e2430.f4e9fc",
+    "name": "",
+    "property": "statusCode",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "200",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 1990,
+    "y": 640,
+    "wires": [
+      [
+        "eeb523ac.c8903"
+      ]
+    ]
+  },
+  {
+    "id": "eeb523ac.c8903",
+    "type": "base64",
+    "z": "229e2430.f4e9fc",
+    "name": "",
+    "action": "str",
+    "property": "payload",
+    "x": 2140,
+    "y": 640,
+    "wires": [
+      [
+        "526cfb23.7076e4"
+      ]
+    ]
+  },
+  {
+    "id": "526cfb23.7076e4",
+    "type": "function",
+    "z": "229e2430.f4e9fc",
+    "name": "Email To",
+    "func": "from = new Date((msg.from * 1000))\nfromdate = ('00' + from.getDate()).slice(-2) + \"_\" + ('00' + (from.getMonth()+1)).slice(-2) +\"_\" + from.getFullYear()\n\nto = new Date((msg.to * 1000))\ntodate = ('00' + to.getDate()).slice(-2) + \"_\" + ('00' + (to.getMonth()+1)).slice(-2) +\"_\" + to.getFullYear()\n\nmsg.attachments = [\n    {  \n        filename: 'Weekly Report (WH 18) ' + fromdate + \" - \" + todate + '.xlsx',\n        content: msg.payload,\n        encoding: 'base64'\n    }\n]\nmsg.to_date = to;\nmsg.payload = ''\nmsg.topic = 'Weekly Report (WH 18) ' + fromdate + \" - \" + todate\nmsg.to = [\n    // 'pronteradap65@gmail.com',\n    'onisuka.blend2@gmail.com',\n    'chanida.yoojun@dixellasia.com',\n    'bowjung1@gmail.com',\n]\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 2300,
+    "y": 640,
+    "wires": [
+      [
+        "efd66827.546f78",
+        "938cb9ad.31d178"
+      ]
+    ]
+  },
+  {
+    "id": "1415d040.b2c05",
+    "type": "debug",
+    "z": "229e2430.f4e9fc",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 1990,
+    "y": 600,
+    "wires": []
+  }
+]

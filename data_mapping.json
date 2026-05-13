@@ -1,0 +1,245 @@
+[
+    {
+        "id": "68f6954b22107130",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "config",
+        "x": 390,
+        "y": 660,
+        "wires": [
+            [
+                "a3985410acd452f7"
+            ]
+        ]
+    },
+    {
+        "id": "6c2a8aa03567c42c",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "120",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 660,
+        "wires": [
+            [
+                "10b2e1942f87bf19"
+            ]
+        ]
+    },
+    {
+        "id": "10b2e1942f87bf19",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    _id: {\n        $type: 'objectId'\n    }\n}\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 660,
+        "wires": [
+            [
+                "68f6954b22107130"
+            ]
+        ]
+    },
+    {
+        "id": "a3985410acd452f7",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "config_url",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config_url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 660,
+        "wires": [
+            [
+                "e88f84cc6406aaa5"
+            ]
+        ]
+    },
+    {
+        "id": "8fab82e57d439410",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: replace data:alarm by xalarms",
+        "func": "let data = msg.payload || {};\nlet xalarms = global.get(\"xalarms\") || {};\n\nconst values = (obj) => Object.values(obj)\nconst keys = (obj) => Object.keys(obj)\nconst entries = (obj) => Object.entries(obj)\nconst getSetup = (xweb) => xweb.setup_data\nconst getSysinfo = (xweb) => xweb.sysinfo_data\nconst decode = (text) => decodeURIComponent(text)\n\nfor(let [mac,xweb_data] of entries(data)){\n    for(let dev of (xweb_data?.devices)){\n        xalarms[mac]&&xalarms[mac].devices[dev.uid]&&xalarms[mac].devices[dev.uid].alarms\n        &&\n        (dev.alarm = entries(xalarms[mac].devices[dev.uid].alarms||{})\n        .filter(([,a])=>a.en)\n        .map(([pointId,a])=>{\n            return {\n                pointId,\n                name:decode(a.name),\n                value:a.value,\n                unit:a.unit\n            }\n        }));\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 660,
+        "wires": [
+            [
+                "4671ed28b6ce36fa"
+            ]
+        ]
+    },
+    {
+        "id": "4671ed28b6ce36fa",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script query",
+        "func": "const payload = msg.payload;\nconst now = new Date().getTime();\nconst upsert = { upsert: true }\n\nlet updated = Object.entries(payload).map(([mac, pay]) => {\n    let filter = { mac };\n    let update = {\n        $set: {\n            [mac]: pay,\n        },\n        $currentDate: {\n            lastModified: true,\n        }\n    }\n    return [filter, update, upsert];\n});\nmsg.payload = updated;\nmsg.operation = \"updateOne\";\nmsg.collection = \"data_mapping\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1190,
+        "y": 660,
+        "wires": [
+            [
+                "cc85fe1485db7cb3"
+            ]
+        ]
+    },
+    {
+        "id": "cc85fe1485db7cb3",
+        "type": "split",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1330,
+        "y": 660,
+        "wires": [
+            [
+                "f0ed129ce548ec88"
+            ]
+        ]
+    },
+    {
+        "id": "f0ed129ce548ec88",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "20",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1480,
+        "y": 660,
+        "wires": [
+            [
+                "e20be8849cecc817"
+            ]
+        ]
+    },
+    {
+        "id": "e20be8849cecc817",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core data_mapping",
+        "x": 1700,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e88f84cc6406aaa5",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "mapping data",
+        "func": "// @ts-nocheck\nlet date_now = new Date().getTime();\nlet limitTime = 900000;\n\nconst isMoreThan15Minutes = (start) => (date_now - start) > limitTime;\n\nconst decodeText = (str) => {\n    const cleaned = str.replace(/%(?![0-9A-Fa-f]{2})/g, '%25');\n    return decodeURIComponent(cleaned);\n}\n\nconst setup_stream = (conf) => {\n    let stream = global.get(\"xstream\") || {};\n    let getsetup = global.get(\"xgetsetup\") || {};\n    let sysInfo = global.get(\"xsysinfo\") || {};\n\n    let communications = global.get(\"CheckCommunications\") || {};\n    let mac = conf.mac_address;\n\n    let cate = {}, devices = {}, status_acq = {}, obj_info = {}, commu = {};\n    devices[mac] = [], cate[mac] = {}, status_acq[mac] = {}, obj_info[mac] = {}, commu[mac] = {};\n\n    if (getsetup[mac] || stream[mac] || sysInfo[mac]) {\n        /*Has key setup_data*/\n        if (\"setup_data\" in (getsetup[mac] || {})) {\n            for (let i in getsetup[mac]?.setup_data.setup.ctgs) {\n                for (let j in getsetup[mac].setup_data.setup.ctgs[i].devs) {\n                    let cate_encoded = encodeURIComponent(getsetup[mac].setup_data.setup.ctgs[i].term)\n                    cate[mac][getsetup[mac].setup_data.setup.ctgs[i].devs[j]] = decodeURIComponent(decodeText(cate_encoded));\n                }\n            }\n        }\n        status_acq[mac].xwebpro_on = stream[mac].stream_data ? stream[mac].stream_data?.stream?.acq : 0;\n        if (\"sysinfo_data\" in (sysInfo[mac] || {})) {\n            let name_encoded = encodeURIComponent(sysInfo[mac].sysinfo_data.info.name);\n            obj_info[mac][\"name\"] = decodeURIComponent(decodeURIComponent(name_encoded));\n        }\n\n        /* Has key stream_data */\n        if (\"stream_data\" in (stream[mac] || {})) {\n            if (\"ts\" in stream[mac].stream_data) {\n                let offline_time = Number(stream[mac].stream_data.ts);\n                /* check offline every 15 min. */\n                let overTime = isMoreThan15Minutes(offline_time);\n\n                if (overTime) {\n                    if (!communications[mac]) {\n                        communications[mac] = {\n                            store_name: conf.xweb_name,\n                            mac_address: mac,\n                            device_name: conf.xweb_name,\n                            device_adr: \"-\",\n                            alarm_name: \"Offline\",\n                            text: \"Offline\",\n                            status: true,\n                            acknow: false,\n                            dateStart: date_now,\n                            offline_count: 0,\n                            offline_timestamp: null,\n                        }\n                    } else {\n                        if (!communications[mac].status) {\n                            communications[mac] = {\n                                ...communications[mac],\n                                status: true,\n                                acknow: false,\n                                dateStart: date_now,\n                                offline_count: 0,\n                                offline_timestamp: null,\n                            }\n                        }\n                    }\n                } else {\n                    if (communications[mac]) {\n                        communications[mac] = {\n                            ...communications[mac],\n                            status: false,\n                        }\n                    }\n                }\n            }\n\n            if (\"stream\" in (stream[mac].stream_data || {})) {\n                for (let i in stream[mac].stream_data.stream.data) {\n                    let deviceId = i;\n                    let adr = getsetup[mac].setup_data?.devices[deviceId]?.gen.addr2;\n                    let name = decodeURIComponent(getsetup[mac].setup_data?.devices[deviceId]?.gen.name);\n                    cate[mac] = cate[mac][deviceId] || \"Others\";\n\n                    let object = {};\n                    object[mac] = {\n                        analogInput: [],\n                        deviceStatus: [],\n                        alarm: [],\n                        digitalinput: [],\n                        outputStatus: [],\n\n                        chartDef: [],\n                    }\n\n                    let model = getsetup[mac].setup_data?.devices[deviceId]?.gen.model;\n                    let dbpath = getsetup[mac].setup_data?.devices[deviceId]?.gen.dbpath;\n\n                    for (let j in getsetup[mac].setup_data?.devices[deviceId]?.vrs) {\n                        if (getsetup[mac].setup_data?.devices[deviceId]?.vrs[j].vfr == 1) {\n                            let pointId = j;\n                            let group;\n                            let point_name;\n\n                            if (getsetup[mac].setup_data?.devices[deviceId]?.vrs[pointId]) {\n                                let vgrp = getsetup[mac].setup_data?.devices[deviceId]?.vrs[pointId].vgrp;\n\n                                switch (vgrp) {\n                                    case 0:\n                                        group = \"analogInput\";\n                                        break;\n                                    case 1:\n                                        group = \"deviceStatus\";\n                                        break;\n                                    case 2:\n                                        group = \"alarm\";\n                                        break;\n                                    case 3:\n                                        group = \"digitalinput\";\n                                        break;\n                                    case 4:\n                                        group = \"outputStatus\";\n                                        break;\n                                }\n                                if (getsetup[mac].setup_data?.devices[deviceId]?.lng.vrs[pointId].uvun) {\n                                    let uvun_encoded = encodeURIComponent(getsetup[mac].setup_data?.devices[deviceId]?.lng.vrs[pointId].uvun);\n                                    point_name = decodeURIComponent(uvun_encoded);\n                                } else {\n                                    let vun_encoded = encodeURIComponent(getsetup[mac].setup_data?.devices[deviceId]?.lng.vrs[pointId].vun);\n                                    point_name = decodeURIComponent(vun_encoded);\n                                }\n                                point_name = decodeText(point_name);\n\n                                if (getsetup[mac].setup_data?.devices[deviceId].vrs[pointId].chartDef.en === true) {\n                                    object[mac][\"chartDef\"].push({\n                                        pointId: pointId,\n                                        name: point_name,\n                                        value: stream[mac].stream_data.stream.data[deviceId][pointId] || 0,\n                                        index: j,\n                                        unit: getsetup[mac].setup_data?.devices[deviceId].vrs[pointId].vudm,\n                                    })\n                                }\n                                if (object[mac][group]) {\n                                    object[mac][group].push({\n                                        pointId: pointId,\n                                        name: point_name,\n                                        value: stream[mac].stream_data.stream.data[deviceId][pointId] || 0,\n                                        unit: getsetup[mac].setup_data?.devices[deviceId].vrs[pointId].vudm,\n                                    })\n                                }\n                            }\n                        }\n                    }\n\n                    devices[mac].push({\n                        name: name,\n                        adr: adr,\n                        cate: cate[mac],\n                        uid: i,\n                        lanid: getsetup[mac].setup_data?.devices[deviceId]?.gen.addr1,\n                        model: model,\n                        dbpath: dbpath,\n                        analogInput: object[mac][\"analogInput\"],\n                        deviceStatus: object[mac][\"deviceStatus\"],\n                        alarm: object[mac][\"alarm\"],\n                        digitalinput: object[mac]['digitalinput'],\n                        outputStatus: object[mac]['outputStatus'],\n\n                        chartDef: object[mac][\"chartDef\"],\n                    });\n                }\n            }\n        } else {\n            communications[mac] = {\n                ...communications[mac],\n                status: true,\n                acknow: false,\n                dateStart: date_now,\n                offline_count: 0,\n                offline_timestamp: null,\n            }\n        }\n\n        global.set(\"CheckCommunications\", communications);\n        return { devices, status_acq, obj_info };\n    }\n}\nconst output = {};\nfor (let conf of msg.config_url) {\n    let compares = setup_stream(conf);\n    let mac = conf.mac_address;\n    output[mac] = {};\n    output[mac].name = compares?.obj_info[mac].name || conf.xweb_name;\n    output[mac].mac_address = mac;\n    output[mac].on = compares?.status_acq[mac].xwebpro_on || 0;\n    output[mac].branch_id = conf.branch_id;\n    output[mac].devices = compares?.devices[mac] || [];\n}\n// flow.set(\"data\", output);\nmsg.payload = output;\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 660,
+        "wires": [
+            [
+                "8fab82e57d439410"
+            ]
+        ]
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    }
+]

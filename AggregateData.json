@@ -1,0 +1,337 @@
+[
+    {
+        "id": "de4c7ef0c221a7c2",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "check communications",
+        "info": "",
+        "x": 340,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "8306c6a75580570d",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "get",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 880,
+        "wires": [
+            [
+                "bca76129677bc101"
+            ]
+        ]
+    },
+    {
+        "id": "bca76129677bc101",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "15",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 310,
+        "y": 880,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "40cf9c4925d1817e",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script query",
+        "func": "msg.collection = \"data_mapping\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 880,
+        "wires": [
+            [
+                "fa79841ea80298c4"
+            ]
+        ]
+    },
+    {
+        "id": "fa79841ea80298c4",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core data_mapping",
+        "x": 860,
+        "y": 880,
+        "wires": [
+            [
+                "189f7bd242a5d96f"
+            ]
+        ]
+    },
+    {
+        "id": "189f7bd242a5d96f",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "convert to object",
+        "func": "let data = msg.payload;\nlet obj = {};\n\nfor (let val of data) {\n    obj[val.mac] = val[val.mac]\n}\nmsg.payload = obj;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 880,
+        "wires": [
+            [
+                "1d2614fd620f091b",
+                "76f3c6d15d50480c"
+            ]
+        ]
+    },
+    {
+        "id": "60dd3a5246d30fbc",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "endpoints",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 820,
+        "wires": [
+            [
+                "d572db1ec2fa36fa"
+            ]
+        ]
+    },
+    {
+        "id": "d572db1ec2fa36fa",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "endpoints",
+        "x": 460,
+        "y": 820,
+        "wires": [
+            [
+                "9db011534dba2a22"
+            ]
+        ]
+    },
+    {
+        "id": "9db011534dba2a22",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config_url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 820,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "3a3e015de9cb4779",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1800",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "update",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 820,
+        "wires": [
+            [
+                "60dd3a5246d30fbc"
+            ]
+        ]
+    },
+    {
+        "id": "214809f5b6ebadaf",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "function 5",
+        "func": "if (msg.topic == \"update\") {\n    context.set(\"endpoints\", msg.payload);\n    node.status({ fill: \"green\", shape: \"ring\", text: \"updated...\" });\n    return null;\n}\n\nif (msg.topic == \"get\") {\n    let data = context.get(\"endpoints\");\n    node.status({ fill: \"blue\", shape: \"ring\", text: data.length });\n    msg.config_url = data;\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 880,
+        "wires": [
+            [
+                "40cf9c4925d1817e"
+            ]
+        ]
+    },
+    {
+        "id": "d22562e9b5ae90de",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "get",
+        "payload": "",
+        "payloadType": "date",
+        "x": 570,
+        "y": 940,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "1d2614fd620f091b",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Data Aggregate",
+        "func": "const xalarms = global.get(\"xalarms\") || {};\nconst xstream = global.get(\"xstream\") || {};\nlet data = msg.payload || {};\n\nconst entries = (obj) => Object.entries(obj);\nconst decode = (t) => decodeURIComponent(t ?? \"\");\n\nlet date_now = new Date().getTime();\n\nconst counter_alarm = (devices = {}) => {\n    let active = 0;\n    let total = Object.keys(devices).length;\n\n    for (const [, dev] of entries(devices)) {\n        for (const [, al] of entries(dev.alarms || {})) {\n            if (al.en && al.value) active++;\n        }\n    }\n    return { active, total };\n}\n\n// BUILD SENSOR DATA\nfunction buildSensor(mac) {\n    if (!data[mac]?.devices) return null;\n    const devices = {};\n    for (const d of data[mac].devices) {\n        const realtime = [];\n        const deviceStatus = [];\n        const analogInput = [];\n        const alarm = [];\n\n        if (Array.isArray(d.chartDef)) {\n            for (const c of d.chartDef) {\n                realtime.push({\n                    name: c.name,\n                    value: c.value,\n                    unit: c.unit\n                });\n            }\n        }\n        if (Array.isArray(d.deviceStatus)) {\n            for (const s of d.deviceStatus) {\n                deviceStatus.push({\n                    point_id: s.pointId,\n                    name: s.name,\n                    value: s.value\n                });\n            }\n        }\n        if (Array.isArray(d.analogInput)) {\n            for (const a of d.analogInput) {\n                analogInput.push({\n                    point_id: a.pointId,\n                    name: a.name,\n                    value: a.value,\n                    unit: a.unit\n                });\n            }\n        }\n        if (Array.isArray(d.alarm)) {\n            for (const al of d.alarm) {\n                if (al.value) {\n                    alarm.push({\n                        point_id: al.pointId,\n                        name: al.name,\n                        value: al.value\n                    });\n                }\n            }\n        }\n        devices[d.uid] = {\n            name: decode(d.name),\n            adr: d.adr,\n            deviceid: d.uid,\n            model: d.model,\n            realTime: realtime,\n            deviceStatus,\n            analogInput,\n            alarm,\n        }\n    }\n    return {\n        name: decode(data[mac].name),\n        mac_address: data[mac].mac_address,\n        on: data[mac].on,\n        devices,\n    }\n}\n\n// COMPARE + BUILD ACTIVE ALARMS\nfunction comparesData(mac, owner) {\n    let chk_watch = global.get(\"chk_watch\") || {};\n    let active_alarms = global.get(\"Active_Alarms\") || {};\n\n    const obj = {};\n    const arr = {};\n    arr[mac] = [];\n\n    if (!xalarms[mac]?.devices) return obj;\n\n    const sensor = buildSensor(mac);\n    const status = counter_alarm(xalarms[mac].devices);\n\n    for (const [did, dev] of entries(xalarms[mac].devices)) {\n        if (!dev.alarms) continue;\n        for (const [pid, al] of entries(dev.alarms || {})) {\n            if (!al.en || !al.value) continue;\n            const idx = `${mac}_${did}_${pid}`;\n\n            if (!chk_watch[idx]) {\n                chk_watch[idx] = {\n                    note: \"\",\n                    acknow: 0,\n                    count: 0,\n                    acknow_count: 0,\n                    timestamp: date_now,\n                }\n            }\n            const ts = chk_watch[idx].count > 0 ? chk_watch[idx].timestamp : active_alarms[idx]?.dateStart ?? date_now;\n            arr[mac].push({\n                xweb_name: decode(sensor?.name) ?? \"\",\n                mac_address: sensor?.mac_address ?? mac,\n                owner,\n                device_name: decode(sensor?.devices[did]?.name) ?? \"\",\n                device_adr: sensor?.devices[did]?.adr ?? \"-\",\n                device_id: did,\n                name: decode(al.name) ?? \"\",\n                point_id: pid,\n                status: al.value > 0 ? \"Active\" : \"Normal\",\n                note: chk_watch[idx].note ?? \"\",\n                acknow: chk_watch[idx]?.acknow,\n                chk_watch: chk_watch[idx]?.count,\n                timestamp: ts,\n                startTime: active_alarms[idx]?.dateStart,\n            })\n        }\n    }\n    global.set(\"chk_watch\", chk_watch);\n    obj[mac] = {\n        name: sensor?.name ?? \"\",\n        mac_address: sensor?.mac_address,\n        on: sensor?.on,\n        devices: sensor?.devices ?? {},\n        active_alarms: arr[mac],\n        status: status\n    };\n    return obj;\n}\n\nconst chk_offline = global.get(\"Offline\") || {};\n\nconst arr_data = [];\nfor (const conf of msg.config_url) {\n    const mac = conf.mac_address;\n    const compares = comparesData(mac, conf.owner);\n\n    if (!chk_offline[mac]) {\n        arr_data.push({\n            _attr: {\n                site_name: data[mac]?.name ?? conf.xweb_name,\n                status_acq: data[mac]?.on,\n                mac,\n                url: conf.url,\n                communication: \"Online\",\n                owner: conf.owner,\n                branch_id: conf.branch_id,\n                lastest_updated: xstream[mac]?.stream_data?.ts\n            },\n            _status: compares[mac]?.status ?? {},\n            _active_alarms: compares[mac]?.active_alarms ?? [],\n            _devices: compares[mac]?.devices ?? {},\n        });\n    } else {\n        arr_data.push({\n            _attr: {\n                site_name: conf.xweb_name,\n                status_acq: 0,\n                mac,\n                url: conf.url,\n                communication: \"Offline\",\n                owner: conf.owner,\n                branch_id: conf.branch_id,\n                lastest_updated: xstream[mac]?.stream_data?.ts ?? date_now,\n            },\n            _status: { active: 0, total: 0 },\n            _active_alarms: [],\n            _devices: {},\n        })\n    }\n}\n\nmsg.payload = arr_data;\nmsg.filename = `/data/files/Data_All.txt`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 820,
+        "wires": [
+            [
+                "fb205c7ad0e8fab9",
+                "f7d4b6bfa344ca54"
+            ]
+        ]
+    },
+    {
+        "id": "76f3c6d15d50480c",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Alarms Aggregate",
+        "func": "const data = msg.payload || {};\nconst date_now = new Date().getTime();\n\n// Counter Alarms\nconst counter_alarm = (devices = {}, mac) => {\n    let active = 0;\n    const total = Object.keys(devices).length;\n\n    for (const d of Object.values(devices)) {\n        for (const al of d.alarm || []) {\n            if (al.value > 0) {\n                active++;\n                break;\n            }\n        }\n    }\n    return {\n        [mac]: {\n            active,\n            total,\n            alarm: active > 0 ? 1 : 0,\n        }\n    }\n}\n// Compares & Aggregate\nfunction comparesData(mac) {\n    let chk_watch = global.get(\"chk_watch\") || {};\n    let chk_commu = global.get(\"CheckCommunications\") || {};\n\n    if (!data[mac]) {\n        return {\n            [mac]: {\n                mac_address: mac,\n                on: 0,\n                devices: [],\n                active_alarm: [],\n                status: { active: 0, total: 0 },\n                chk_watch: 0,\n                acknow: 0,\n                acknow_count: 0,\n                offline_count: 0,\n                offline_timestamp: null\n            }\n        }\n    }\n    const devices = data[mac].devices || [];\n    const status = counter_alarm(devices, mac)[mac];\n\n    // Aggregate chk_watch\n    let chk_sum = { count: 0, acknow: 0, acknow_count: 0 };\n    for (const [key, v] of Object.entries(chk_watch)) {\n        if (key.startsWith(mac)) {\n            chk_sum.count += v.count || 0;\n            chk_sum.acknow += v.acknow || 0;\n            chk_sum.acknow_count += v.acknow_count || 0;\n        }\n    }\n\n    // Aggregate Communication\n    const commu = chk_commu[mac] || {};\n    const offline_count = commu.offline_count || 0;\n    const offline_timestamp = commu.offline_timestamp || null;\n\n    // Build active alarm list.\n    const active_alarm = [];\n    for (const d of devices) {\n        for (const al of d.alarm || []) {\n            if (al.value > 0) {\n                active_alarm.push({\n                    xweb_name: data[mac].name,\n                    mac_address: data[mac].mac_address,\n                    device_name: d.name,\n                    device_adr: d.adr,\n                    device_id: d.uid,\n                    name: al.name,\n                    point_id: al.pointId,\n                })\n            }\n        }\n    }\n    return {\n        [mac]: {\n            mac_address: mac,\n            on: data[mac].on,\n            devices,\n            active_alarm,\n            status,\n            chk_watch: chk_sum.count,\n            acknow: chk_sum.acknow,\n            acknow_count: chk_sum.acknow_count,\n            offline_count,\n            offline_timestamp,\n        }\n    }\n}\n// Build Final Payload\nconst arr_data = [];\nconst chk_offline = global.get(\"Offline\") || {};\nconst communications = global.get(\"CheckCommunications\") || {};\n\nfor (let conf of msg.config_url) {\n    const mac = conf.mac_address;\n    const compares = comparesData(mac)[mac];\n\n    if (!chk_offline[mac]) {\n        arr_data.push({\n            store_name: data[mac]?.name ?? conf.xweb_name,\n            mac,\n            url: conf.external_ip,\n            communication: \"Online\",\n            owner: conf.owner,\n            note: \"\",\n            alarm: compares.status,\n            chk_watch: compares.chk_watch,\n            acknow: compares.acknow,\n            acknow_count: compares.acknow_count,\n            offline_count: compares.offline_count,\n            offline_timestamp: compares.offline_timestamp || date_now,\n        });\n    } else {\n        arr_data.push({\n            store_name: conf.xweb_name,\n            mac,\n            url: conf.external_ip,\n            communication: \"Offline\",\n            owner: conf.owner,\n            note: chk_offline[mac]?.acknow ? chk_offline[mac]?.text || \"Acknowledge\" : \"\",\n            date_offline: chk_offline[mac]?.dateStart || date_now,\n            acknow_offline: chk_offline[mac]?.acknow || false,\n            alarm: { active: 0, total: 0 },\n            chk_watch: 0,\n            acknow: 0,\n            acknow_count: 0,\n            offline_count: communications[mac]?.offline_count || 0,\n            offline_timestamp: communications[mac]?.offline_timestamp || date_now,\n        })\n    }\n}\nmsg.payload = arr_data;\nmsg.filename = \"/data/files/Aggregate_Alarms.txt\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 940,
+        "wires": [
+            [
+                "855268eb5232095d"
+            ]
+        ]
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    }
+]

@@ -1,0 +1,1165 @@
+[
+    {
+        "id": "68f6954b22107130",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "config",
+        "x": 630,
+        "y": 660,
+        "wires": [
+            [
+                "f6a78440d3a4ad9c"
+            ]
+        ]
+    },
+    {
+        "id": "6c2a8aa03567c42c",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 660,
+        "wires": [
+            [
+                "46ebfb21c806ff96"
+            ]
+        ]
+    },
+    {
+        "id": "10b2e1942f87bf19",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    _id: {\n        $type: 'objectId'\n    }\n}\nmsg.projection = {\n    _id: 0,\n    id: 1,\n    mac_address: 1,\n    xweb_name: 1,\n    external_ip: 1,\n    url: 1,\n    owner: 1,\n    branch_id: 1\n};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 660,
+        "wires": [
+            [
+                "68f6954b22107130"
+            ]
+        ]
+    },
+    {
+        "id": "a3985410acd452f7",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "config_url",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config_url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9673404b057c88a7",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "data compares # not use",
+        "info": "",
+        "x": 530,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "8306c6a75580570d",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "get",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 960,
+        "wires": [
+            [
+                "01bf62888fb21489"
+            ]
+        ]
+    },
+    {
+        "id": "2e7a4d4eee365c70",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Aggregate Data",
+        "info": "",
+        "x": 800,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "d44bc5c8c7a5a56f",
+        "type": "link in",
+        "z": "9e5d9fa8c426baa4",
+        "d": true,
+        "name": "Tricker",
+        "links": [
+            "5f2f97e9bb58918c",
+            "96692708c6b023c2",
+            "c0795b47d4643526",
+            "cbc452714dbf5922"
+        ],
+        "x": 275,
+        "y": 840,
+        "wires": [
+            [
+                "60dd3a5246d30fbc"
+            ]
+        ]
+    },
+    {
+        "id": "8fab82e57d439410",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: replace data:alarm by xalarms",
+        "func": "let data = msg.payload || {};\nlet xalarms = global.get(\"xalarms\") || {};\n\nconst values = (obj) => Object.values(obj)\nconst keys = (obj) => Object.keys(obj)\nconst entries = (obj) => Object.entries(obj)\nconst getSetup = (xweb) => xweb.setup_data\nconst getSysinfo = (xweb) => xweb.sysinfo_data\nconst decode = (text) => decodeURIComponent(text)\n\nfor(let [mac,xweb_data] of entries(data)){\n    for(let dev of (xweb_data?.devices)){\n        xalarms[mac]&&xalarms[mac].devices[dev.uid]&&xalarms[mac].devices[dev.uid].alarms\n        &&\n        (dev.alarm = entries(xalarms[mac].devices[dev.uid].alarms||{})\n        .filter(([,a])=>a.en)\n        .map(([pointId,a])=>{\n            return {\n                pointId,\n                name:decode(a.name),\n                value:a.value,\n                unit:a.unit\n            }\n        }));\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 660,
+        "wires": [
+            [
+                "c64199a6cfff8d55"
+            ]
+        ]
+    },
+    {
+        "id": "fb205c7ad0e8fab9",
+        "type": "file",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1600,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "60dd3a5246d30fbc",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "endpoints",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 900,
+        "wires": [
+            [
+                "d572db1ec2fa36fa"
+            ]
+        ]
+    },
+    {
+        "id": "d572db1ec2fa36fa",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "endpoints",
+        "x": 460,
+        "y": 900,
+        "wires": [
+            [
+                "9db011534dba2a22"
+            ]
+        ]
+    },
+    {
+        "id": "9db011534dba2a22",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config_url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 900,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "3a3e015de9cb4779",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1800",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "update",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 900,
+        "wires": [
+            [
+                "60dd3a5246d30fbc"
+            ]
+        ]
+    },
+    {
+        "id": "214809f5b6ebadaf",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "function 5",
+        "func": "if (msg.topic == \"update\") {\n    // context.set(\"endpoints\", msg.payload);\n    flow.set(\"endpoints\", msg.payload);\n    node.status({ fill: \"green\", shape: \"ring\", text: \"updated...\" });\n    return null;\n}\n\nif (msg.topic == \"get\") {\n    // let data = context.get(\"endpoints\");\n    let data = flow.get(\"endpoints\");\n    node.status({ fill: \"blue\", shape: \"ring\", text: data.length });\n    msg.payload = data;\n    // msg.config_url = data;\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 960,
+        "wires": [
+            [
+                "f579460c404242ef"
+            ]
+        ]
+    },
+    {
+        "id": "d22562e9b5ae90de",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "get",
+        "payload": "",
+        "payloadType": "date",
+        "x": 430,
+        "y": 1060,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "1d2614fd620f091b",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Data Aggregate",
+        "func": "const xalarms = global.get(\"xalarms\") || {};\nconst xstream = global.get(\"xstream\") || {};\nconst config_url = flow.get(\"endpoints\") ; //gg\nlet data = msg.payload || {};\n\nconst entries = (obj) => Object.entries(obj);\nconst decode = (t) => decodeURIComponent(t ?? \"\");\n\nlet date_now = new Date().getTime();\n\nconst counter_alarm = (devices = {}) => {\n    let active = 0;\n    let total = Object.keys(devices).length;\n\n    for (const [, dev] of entries(devices)) {\n        for (const [, al] of entries(dev.alarms || {})) {\n            if (al.en && al.value) active++;\n        }\n    }\n    return { active, total };\n}\n\n// BUILD SENSOR DATA\nfunction buildSensor(mac) {\n    if (!data[mac]?.devices) return null;\n    const devices = {};\n    for (const d of data[mac].devices) {\n        const realtime = [];\n        const deviceStatus = [];\n        const analogInput = [];\n        const alarm = [];\n\n        if (Array.isArray(d.chartDef)) {\n            for (const c of d.chartDef) {\n                realtime.push({\n                    name: c.name,\n                    value: c.value,\n                    unit: c.unit\n                });\n            }\n        }\n        if (Array.isArray(d.deviceStatus)) {\n            for (const s of d.deviceStatus) {\n                deviceStatus.push({\n                    point_id: s.pointId,\n                    name: s.name,\n                    value: s.value\n                });\n            }\n        }\n        if (Array.isArray(d.analogInput)) {\n            for (const a of d.analogInput) {\n                analogInput.push({\n                    point_id: a.pointId,\n                    name: a.name,\n                    value: a.value,\n                    unit: a.unit\n                });\n            }\n        }\n        if (Array.isArray(d.alarm)) {\n            for (const al of d.alarm) {\n                if (al.value) {\n                    alarm.push({\n                        point_id: al.pointId,\n                        name: al.name,\n                        value: al.value\n                    });\n                }\n            }\n        }\n        devices[d.uid] = {\n            name: decode(d.name),\n            adr: d.adr,\n            deviceid: d.uid,\n            model: d.model,\n            realTime: realtime,\n            deviceStatus,\n            analogInput,\n            alarm,\n        }\n    }\n    return {\n        name: decode(data[mac].name),\n        mac_address: data[mac].mac_address,\n        on: data[mac].on,\n        devices,\n    }\n}\n\n// COMPARE + BUILD ACTIVE ALARMS\nfunction comparesData(mac, owner) {\n    let chk_watch = global.get(\"chk_watch\") || {};\n    let active_alarms = global.get(\"Active_Alarms\") || {};\n\n    const obj = {};\n    const arr = {};\n    arr[mac] = [];\n\n    if (!xalarms[mac]?.devices) return obj;\n\n    const sensor = buildSensor(mac);\n    const status = counter_alarm(xalarms[mac].devices);\n\n    for (const [did, dev] of entries(xalarms[mac].devices)) {\n        if (!dev.alarms) continue;\n        for (const [pid, al] of entries(dev.alarms || {})) {\n            if (!al.en || !al.value) continue;\n            const idx = `${mac}_${did}_${pid}`;\n\n            if (!chk_watch[idx]) {\n                chk_watch[idx] = {\n                    note: \"\",\n                    acknow: 0,\n                    count: 0,\n                    acknow_count: 0,\n                    timestamp: date_now,\n                }\n            }\n            const ts = chk_watch[idx].count > 0 ? chk_watch[idx].timestamp : active_alarms[idx]?.dateStart ?? date_now;\n            arr[mac].push({\n                xweb_name: decode(sensor?.name) ?? \"\",\n                mac_address: sensor?.mac_address ?? mac,\n                owner,\n                device_name: decode(sensor?.devices[did]?.name) ?? \"\",\n                device_adr: sensor?.devices[did]?.adr ?? \"-\",\n                device_id: did,\n                name: decode(al.name) ?? \"\",\n                point_id: pid,\n                status: al.value > 0 ? \"Active\" : \"Normal\",\n                note: chk_watch[idx].note ?? \"\",\n                acknow: chk_watch[idx]?.acknow,\n                chk_watch: chk_watch[idx]?.count,\n                timestamp: ts,\n                startTime: active_alarms[idx]?.dateStart,\n            })\n        }\n    }\n    global.set(\"chk_watch\", chk_watch);\n    obj[mac] = {\n        name: sensor?.name ?? \"\",\n        mac_address: sensor?.mac_address,\n        on: sensor?.on,\n        devices: sensor?.devices ?? {},\n        active_alarms: arr[mac],\n        status: status\n    };\n    return obj;\n}\n\nconst chk_offline = global.get(\"Offline\") || {};\n\nconst arr_data = [];\n// for (const conf of msg.config_url) {\nfor (const conf of config_url) { //GG\n    const mac = conf.mac_address;\n    const compares = comparesData(mac, conf.owner);\n\n    const isOffline = chk_offline[mac];\n\n    if (!isOffline) {\n        arr_data.push({\n            _attr: {\n                site_name: data[mac]?.name ?? conf.xweb_name,\n                status_acq: data[mac]?.on,\n                mac,\n                url: conf.url,\n                communication: \"Online\",\n                owner: conf.owner,\n                branch_id: conf.branch_id,\n                lastest_updated: xstream[mac]?.stream_data?.ts\n            },\n            _status: compares[mac]?.status ?? {},\n            _active_alarms: compares[mac]?.active_alarms ?? [],\n            _devices: compares[mac]?.devices ?? {},\n        });\n    } else {\n        arr_data.push({\n            _attr: {\n                site_name: conf.xweb_name,\n                status_acq: 0,\n                mac,\n                url: conf.url,\n                communication: \"Offline\",\n                owner: conf.owner,\n                branch_id: conf.branch_id,\n                lastest_updated: xstream[mac]?.stream_data?.ts ?? date_now,\n            },\n            _status: { active: 0, total: 0 },\n            _active_alarms: [],\n            _devices: {},\n        })\n    }\n}\n\nmsg.payload = arr_data;\nmsg.filename = `/data/files/Data_All.txt`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1400,
+        "y": 900,
+        "wires": [
+            [
+                "fb205c7ad0e8fab9",
+                "f7d4b6bfa344ca54"
+            ]
+        ]
+    },
+    {
+        "id": "76f3c6d15d50480c",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Alarms Aggregate",
+        "func": "const data = msg.payload || {};\nconst date_now = new Date().getTime();\nconst config_url = flow.get(\"endpoints\")\n// Counter Alarms\nconst counter_alarm = (devices = {}, mac) => {\n    let active = 0;\n    const total = Object.keys(devices).length;\n\n    for (const d of Object.values(devices)) {\n        for (const al of d.alarm || []) {\n            if (al.value > 0) {\n                active++;\n                break;\n            }\n        }\n    }\n    return {\n        [mac]: {\n            active,\n            total,\n            alarm: active > 0 ? 1 : 0,\n        }\n    }\n}\n// Compares & Aggregate\nfunction comparesData(mac) {\n    let chk_watch = global.get(\"chk_watch\") || {};\n    let chk_commu = global.get(\"CheckCommunications\") || {};\n\n    if (!data[mac]) {\n        return {\n            [mac]: {\n                mac_address: mac,\n                on: 0,\n                devices: [],\n                active_alarm: [],\n                status: { active: 0, total: 0 },\n                chk_watch: 0,\n                acknow: 0,\n                acknow_count: 0,\n                offline_count: 0,\n                offline_timestamp: null\n            }\n        }\n    }\n    const devices = data[mac].devices || [];\n    const status = counter_alarm(devices, mac)[mac];\n\n    // Aggregate chk_watch\n    let chk_sum = { count: 0, acknow: 0, acknow_count: 0 };\n    for (const [key, v] of Object.entries(chk_watch)) {\n        if (key.startsWith(mac)) {\n            chk_sum.count += v.count || 0;\n            chk_sum.acknow += v.acknow || 0;\n            chk_sum.acknow_count += v.acknow_count || 0;\n        }\n    }\n\n    // Aggregate Communication\n    const commu = chk_commu[mac] || {};\n    const offline_count = commu.offline_count || 0;\n    const offline_timestamp = commu.offline_timestamp || null;\n\n    // Build active alarm list.\n    const active_alarm = [];\n    for (const d of devices) {\n        for (const al of d.alarm || []) {\n            if (al.value > 0) {\n                active_alarm.push({\n                    xweb_name: data[mac].name,\n                    mac_address: data[mac].mac_address,\n                    device_name: d.name,\n                    device_adr: d.adr,\n                    device_id: d.uid,\n                    name: al.name,\n                    point_id: al.pointId,\n                })\n            }\n        }\n    }\n    return {\n        [mac]: {\n            mac_address: mac,\n            on: data[mac].on,\n            devices,\n            active_alarm,\n            status,\n            chk_watch: chk_sum.count,\n            acknow: chk_sum.acknow,\n            acknow_count: chk_sum.acknow_count,\n            offline_count,\n            offline_timestamp,\n        }\n    }\n}\n// Build Final Payload\nconst arr_data = [];\nconst chk_offline = global.get(\"Offline\") || {};\nconst communications = global.get(\"CheckCommunications\") || {};\n\nfor (let conf of config_url) {\n    const mac = conf.mac_address;\n    const compares = comparesData(mac)[mac];\n\n    const isOffline = chk_offline[mac];\n\n    if (!isOffline) {\n        arr_data.push({\n            store_name: data[mac]?.name ?? conf.xweb_name,\n            mac,\n            url: conf.external_ip,\n            communication: \"Online\",\n            owner: conf.owner,\n            note: \"\",\n            alarm: compares.status,\n            chk_watch: compares.chk_watch,\n            acknow: compares.acknow,\n            acknow_count: compares.acknow_count,\n            offline_count: compares.offline_count,\n            offline_timestamp: compares.offline_timestamp || date_now,\n        });\n    } else {\n        arr_data.push({\n            store_name: conf.xweb_name,\n            mac,\n            url: conf.external_ip,\n            communication: \"Offline\",\n            owner: conf.owner,\n            note: chk_offline[mac]?.acknow ? chk_offline[mac]?.text || \"Acknowledge\" : \"\",\n            date_offline: chk_offline[mac]?.dateStart || date_now,\n            acknow_offline: chk_offline[mac]?.acknow || false,\n            alarm: { active: 0, total: 0 },\n            chk_watch: 0,\n            acknow: 0,\n            acknow_count: 0,\n            offline_count: communications[mac]?.offline_count || 0,\n            offline_timestamp: communications[mac]?.offline_timestamp || date_now,\n        })\n    }\n}\nmsg.payload = arr_data;\nmsg.filename = \"/data/files/Aggregate_Alarms.txt\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1410,
+        "y": 1040,
+        "wires": [
+            [
+                "855268eb5232095d"
+            ]
+        ]
+    },
+    {
+        "id": "e39be16140c4ba5c",
+        "type": "catch",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "scope": [
+            "fe01f1356dd7adee",
+            "42650f24f17be4dc"
+        ],
+        "uncaught": false,
+        "x": 1950,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fe01f1356dd7adee",
+        "type": "mongodb out",
+        "z": "9e5d9fa8c426baa4",
+        "mongodb": "e4536c0647789e87",
+        "name": "",
+        "collection": "",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 2020,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "f3ad4844afbd826c",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "bulkWrite",
+        "func": "const { MongoClient } = MongoDB;\n\nconst uri = \"mongodb+srv://cluster-test.teaxzne.mongodb.net\";\n\nconst client = new MongoClient(uri, {\n  tls: true,\n  authMechanism: \"MONGODB-X509\",\n  tlsCertificateKeyFile: \"/home/watpnas/X509-cert-590808797613905362.pem\"\n});\nawait client.connect();\nconst col = client.db(\"cj-core\").collection(\"data_all\");\nawait col.bulkWrite(msg.payload, { ordered: false });\nawait client.close();\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "MongoDB",
+                "module": "mongodb"
+            }
+        ],
+        "x": 1780,
+        "y": 900,
+        "wires": [
+            [
+                "fe01f1356dd7adee",
+                "89d31b367182b295"
+            ]
+        ]
+    },
+    {
+        "id": "f7d4b6bfa344ca54",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Normalize/Validate",
+        "func": "if (!Array.isArray(msg.payload)) {\n    node.error(\"payload is NOT array\", msg.payload);\n    return null;\n}\n\nfunction deepClean(obj) {\n    return JSON.parse(JSON.stringify(obj));\n}\n\n/* Protected of Mongodb Error($, .) */\nfunction sanitizeKeys(obj) {\n    if (Array.isArray(obj)) {\n        return obj.map(sanitizeKeys);\n    }\n\n    if (obj && typeof obj === \"object\") {\n        const clean = {};\n        for (const [k, v] of Object.entries(obj)) {\n            if (k.startsWith(\"$\") || k.includes(\".\")) continue;\n            clean[k] = sanitizeKeys(v);\n        }\n        return clean;\n    }\n    return obj;\n}\n\nconst BATCH_SIZE = 200;\nconst ops = [];\n\nfor (const item of msg.payload) {\n    const mac = item?.mac || item?._attr?.mac;\n    if (!mac) continue;\n\n    const rawData = item.data ?? item;\n    const safeData = sanitizeKeys(deepClean(rawData));\n\n    ops.push({\n        updateOne: {\n            filter: { mac },\n            update: {\n                $set: {\n                    mac,\n                    ...safeData\n                },\n                $currentDate: { lastModified: true },\n            },\n            upsert: true,\n        }\n    })\n}\n\nif (ops.length === 0) return null;\n\n/* แยก batch -> 1 msg = 1 bulkWrite */\nconst messages = [];\nfor (let i = 0; i < ops.length; i += BATCH_SIZE) {\n    messages.push({\n        collection: \"data_all\",\n        operation: \"bulkWrite\",\n        payload: ops.slice(i, i + BATCH_SIZE),\n        options: { ordered: false }\n    })\n}\nconst now = new Date();\nnode.status({\n    fill: \"green\",\n    shape: \"dot\",\n    text: `BulkWrite ${messages.length} batch(es) @ ${now.toLocaleString(\"en-GB\", {\n        timeZone: \"Asia/Bangkok\",\n        hour12: false\n    })}`\n});\n\nreturn [messages];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "MongoDB",
+                "module": "mongodb"
+            }
+        ],
+        "x": 1610,
+        "y": 900,
+        "wires": [
+            [
+                "f3ad4844afbd826c",
+                "39ed80a752cd7d6c"
+            ]
+        ]
+    },
+    {
+        "id": "855268eb5232095d",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Normalize/Validate",
+        "func": "if (!Array.isArray(msg.payload)) {\n    node.error(\"payload is NOT array\", msg.payload);\n    return null;\n}\n\nfunction deepClean(obj) {\n    return JSON.parse(JSON.stringify(obj));\n}\n\n/* Protected of Mongodb Error($, .) */\nfunction sanitizeKeys(obj) {\n    if (Array.isArray(obj)) {\n        return obj.map(sanitizeKeys);\n    }\n\n    if (obj && typeof obj === \"object\") {\n        const clean = {};\n        for (const [k, v] of Object.entries(obj)) {\n            if (k.startsWith(\"$\") || k.includes(\".\")) continue;\n            clean[k] = sanitizeKeys(v);\n        }\n        return clean;\n    }\n    return obj;\n}\n\nconst BATCH_SIZE = 200;\nconst ops = [];\n\nfor (const item of msg.payload) {\n    const mac = item?.mac || item?._attr?.mac;\n    if (!mac) continue;\n\n    const rawData = item.data ?? item;\n    const safeData = sanitizeKeys(deepClean(rawData));\n\n    ops.push({\n        updateOne: {\n            filter: { mac },\n            update: {\n                $set: {\n                    mac,\n                    ...safeData\n                },\n                $currentDate: { lastModified: true },\n            },\n            upsert: true,\n        }\n    })\n}\n\nif (ops.length === 0) return null;\n\n/* แยก batch -> 1 msg = 1 bulkWrite */\nconst messages = [];\nfor (let i = 0; i < ops.length; i += BATCH_SIZE) {\n    messages.push({\n        collection: \"alarms_aggregate\",\n        operation: \"bulkWrite\",\n        payload: ops.slice(i, i + BATCH_SIZE),\n        options: { ordered: false }\n    })\n}\nconst now = new Date();\nnode.status({\n    fill: \"green\",\n    shape: \"dot\",\n    text: `BulkWrite ${messages.length} batch(es) @ ${now.toLocaleString(\"en-GB\", {\n        timeZone: \"Asia/Bangkok\",\n        hour12: false\n    })}`\n});\n\nreturn [messages];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "MongoDB",
+                "module": "mongodb"
+            }
+        ],
+        "x": 1610,
+        "y": 1040,
+        "wires": [
+            [
+                "405ba0c3ece4d337"
+            ]
+        ]
+    },
+    {
+        "id": "405ba0c3ece4d337",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "bulkWrite",
+        "func": "const { MongoClient } = MongoDB;\n\nconst uri = \"mongodb+srv://cluster-test.teaxzne.mongodb.net\";\n\nconst client = new MongoClient(uri, {\n  tls: true,\n  authMechanism: \"MONGODB-X509\",\n  tlsCertificateKeyFile: \"/home/watpnas/X509-cert-590808797613905362.pem\"\n});\nawait client.connect();\nconst col = client.db(\"cj-core\").collection(\"alarms_aggregate\");\nawait col.bulkWrite(msg.payload, { ordered: false });\nawait client.close();\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "MongoDB",
+                "module": "mongodb"
+            }
+        ],
+        "x": 1780,
+        "y": 1040,
+        "wires": [
+            [
+                "42650f24f17be4dc"
+            ]
+        ]
+    },
+    {
+        "id": "42650f24f17be4dc",
+        "type": "mongodb out",
+        "z": "9e5d9fa8c426baa4",
+        "mongodb": "e4536c0647789e87",
+        "name": "",
+        "collection": "",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 2020,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "46ebfb21c806ff96",
+        "type": "trigger",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "0",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 340,
+        "y": 660,
+        "wires": [
+            [
+                "10b2e1942f87bf19"
+            ]
+        ]
+    },
+    {
+        "id": "c64199a6cfff8d55",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Prepare File Tasks",
+        "func": "const payload = msg.payload;\nconst tasks = [];\n\nconst basePath = \"/data/files/\";\n\nfor (let mac in payload) {\n    tasks.push({\n        payload: payload[mac],\n        filename: basePath + mac + \".json\",\n        mac_address: mac\n    })\n}\ntasks[tasks.length - 1][\"last\"] = true\nmsg.payload = tasks;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 740,
+        "wires": [
+            [
+                "1c325d5ced94e57c"
+            ]
+        ]
+    },
+    {
+        "id": "1c325d5ced94e57c",
+        "type": "split",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 530,
+        "y": 740,
+        "wires": [
+            [
+                "ac6ee1a2211f3faf"
+            ]
+        ]
+    },
+    {
+        "id": "ac6ee1a2211f3faf",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 740,
+        "wires": [
+            [
+                "59e745f3b67a87ca"
+            ]
+        ]
+    },
+    {
+        "id": "93182a92e95afa85",
+        "type": "file",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 980,
+        "y": 740,
+        "wires": [
+            [
+                "231f2e3dc3faa079"
+            ]
+        ]
+    },
+    {
+        "id": "052fca7f1c50e91d",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "unlock",
+        "func": "flow.set(\"isProcessing\", false);\nnode.status({ fill: \"green\", shape: \"dot\", text: \"Finished - Ready\" });\nmsg.reset = 1;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 740,
+        "wires": [
+            [
+                "46ebfb21c806ff96",
+                "d37931c818c9f301"
+            ]
+        ]
+    },
+    {
+        "id": "59e745f3b67a87ca",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "msg",
+        "func": "msg = {\n    payload: msg.payload,\n    filename: msg.payload.filename,\n    parts: msg.parts\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 740,
+        "wires": [
+            [
+                "93182a92e95afa85"
+            ]
+        ]
+    },
+    {
+        "id": "f579460c404242ef",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "filePath",
+        "func": "\nconst payload = msg.payload;\nconst basePath = \"/data/files/\";\nconst tasks = [];\n\nfor (let i in payload) {\n    tasks.push({\n        filename: basePath + payload[i].mac_address + \".json\",\n        mac_address: payload[i].mac_address\n    })\n}\nmsg.payload = tasks;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 960,
+        "wires": [
+            [
+                "e32cb688604afd0e"
+            ]
+        ]
+    },
+    {
+        "id": "9a2295f078ea1d51",
+        "type": "file in",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "filename": "filename",
+        "filenameType": "msg",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1020,
+        "y": 960,
+        "wires": [
+            [
+                "bc74d1bbf1e2fab3"
+            ]
+        ]
+    },
+    {
+        "id": "e32cb688604afd0e",
+        "type": "split",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 770,
+        "y": 960,
+        "wires": [
+            [
+                "0547afa479aa2515"
+            ]
+        ]
+    },
+    {
+        "id": "0547afa479aa2515",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "msg",
+        "func": "\nmsg.filename = msg.payload.filename;\nmsg.mac_address = msg.payload.mac_address;\n// msg.config_url = msg.config_url;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 960,
+        "wires": [
+            [
+                "9a2295f078ea1d51"
+            ]
+        ]
+    },
+    {
+        "id": "3eb519e23c518dda",
+        "type": "join",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "payload.mac_address",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": false,
+        "timeout": "10",
+        "count": "count",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 1490,
+        "y": 960,
+        "wires": [
+            [
+                "ebcfef5862cb6c54",
+                "1d2614fd620f091b",
+                "e97ebd1fbe73c732"
+            ]
+        ]
+    },
+    {
+        "id": "4a389dc6c614f548",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Convert to Object",
+        "func": "// let data = msg.payload || {};\n// const payload = data.payload || data;\n\n// msg.mac_address =\n//     payload.mac_address || \"\";\n\n// msg.payload = {\n//     name:\n//         payload.name ||\n//         payload.xweb_name ||\n//         \"\",\n\n\n//     mac_address:\n//         payload.mac_address ||\n//         \"\",\n\n\n//     on:\n//         payload.on ?? 0,\n\n\n//     branch_id:\n//         payload.branch_id ||\n//         \"\",\n\n\n//     devices:\n//         payload.devices ||\n//         []\n// };\n\n// return msg;\nlet data = msg.payload;\nmsg.mac_address = data.mac_address;\nmsg.payload = {\n    name: data?.payload?.name || data.payload.xweb_name,\n    mac_address: data?.payload?.mac_address ,\n    on: data.payload?.on  || 0,\n    branch_id: data?.payload?.branch_id ,\n    devices: data?.payload?.devices ||  []\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1330,
+        "y": 960,
+        "wires": [
+            [
+                "3eb519e23c518dda"
+            ]
+        ]
+    },
+    {
+        "id": "ebcfef5862cb6c54",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "reset",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 1020,
+        "wires": [
+            [
+                "01bf62888fb21489"
+            ]
+        ]
+    },
+    {
+        "id": "01bf62888fb21489",
+        "type": "trigger",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "0",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 320,
+        "y": 960,
+        "wires": [
+            [
+                "214809f5b6ebadaf"
+            ]
+        ]
+    },
+    {
+        "id": "c71164208d11ec89",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "reset",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "reset",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1040,
+        "wires": [
+            [
+                "01bf62888fb21489"
+            ]
+        ]
+    },
+    {
+        "id": "bc74d1bbf1e2fab3",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "catch json",
+        "func": "try {\n    msg.payload = JSON.parse(msg.payload);\n    return msg;\n} catch (e) {\n    // node.error(\"JSON เสียหายที่ไฟล์: \" + msg.filename);\n    return null; // ข้ามไฟล์ที่เสียไปเลย\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 960,
+        "wires": [
+            [
+                "4a389dc6c614f548"
+            ]
+        ]
+    },
+    {
+        "id": "e97ebd1fbe73c732",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "20",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1240,
+        "y": 1040,
+        "wires": [
+            [
+                "76f3c6d15d50480c"
+            ]
+        ]
+    },
+    {
+        "id": "d37931c818c9f301",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "completed",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1450,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "bea73ebb686ae84a",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Stop",
+        "props": [
+            {
+                "p": "reset",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 740,
+        "wires": [
+            [
+                "46ebfb21c806ff96"
+            ]
+        ]
+    },
+    {
+        "id": "f6a78440d3a4ad9c",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "mapping data",
+        "func": "// @ts-nocheck\n\nconst limitTime = 900000; // 15 นาที\nconst OFFLINE_THRESHOLD = 2; // ต้อง offline 2 รอบติดก่อน trigger\n\nconst isMoreThan15Minutes = (ts = 0) => {\n    if (!ts) return true;\n    const now = Date.now();\n    return (now - ts) > limitTime;\n};\n\nconst normalizaTimestamp = (ts) => {\n    let t = Number(ts);\n    if (!t) return 0;\n    if (t < 1e12) t *= 1000;\n    return t;\n};\n\nconst decodeText = (str = \"\") => {\n    try {\n        const cleaned = str.replace(/%(?![0-9A-Fa-f]{2})/g, '%25');\n        return decodeURIComponent(cleaned);\n    } catch (e) {\n        return str;\n    }\n};\n\nconst setup_stream = (conf) => {\n    let stream = global.get(\"xstream\") || {};\n    let getsetup = global.get(\"xgetsetup\") || {};\n    let sysInfo = global.get(\"xsysinfo\") || {};\n    let communications = global.get(\"CheckCommunications\") || {};\n\n    const now = Date.now();\n    const mac = conf.mac_address;\n\n    let devices = { [mac]: [] };\n    let status_acq = { [mac]: {} };\n    let obj_info = { [mac]: {} };\n    let cate = { [mac]: {} };\n\n    const setup = getsetup[mac]?.setup_data;\n    const streamObj = stream[mac]?.stream_data;\n    const sys = sysInfo[mac]?.sysinfo_data;\n\n    if (!setup && !streamObj && !sys) {\n        return { devices, status_acq, obj_info };\n    }\n\n    /* ---------------- CATEGORY ---------------- */\n    const ctgs = setup?.setup?.ctgs;\n    if (Array.isArray(ctgs)) {\n        for (let category of ctgs) {\n            const devs = category?.devs || [];\n            let cateName = decodeText(category?.term || \"\");\n\n            for (let devId of devs) {\n                cate[mac][devId] = cateName;\n            }\n        }\n    }\n\n    /* ---------------- SYS INFO ---------------- */\n    if (sys?.info?.name) {\n        obj_info[mac][\"name\"] = decodeText(sys.info.name);\n    }\n\n    /* ---------------- STATUS ---------------- */\n    status_acq[mac].xwebpro_on = streamObj?.stream?.acq || 0;\n\n    /* ---------------- INIT COMM ---------------- */\n    if (!communications[mac]) {\n        communications[mac] = {\n            status: false,              // false = ONLINE, true = OFFLINE\n            offline_streak: 0,\n            offline_count: 0\n        };\n    }\n\n    /* ---------------- TS CHECK ---------------- */\n    const ts = normalizaTimestamp(streamObj?.ts);\n    const isOffline = isMoreThan15Minutes(ts);\n\n    /* ---------------- DEBOUNCE ---------------- */\n    if (isOffline) {\n        communications[mac].offline_streak = Math.min(\n            communications[mac].offline_streak + 1,\n            OFFLINE_THRESHOLD\n        );\n    } else {\n        communications[mac].offline_streak = 0;\n    }\n\n    /* ---------------- STATE MACHINE ---------------- */\n    // ONLINE → OFFLINE\n    if (\n        communications[mac].offline_streak === OFFLINE_THRESHOLD &&\n        communications[mac].status === false\n    ) {\n        communications[mac] = {\n            ...communications[mac],\n            store_name: conf.xweb_name,\n            mac_address: mac,\n            device_name: conf.xweb_name,\n            alarm_name: \"Offline\",\n            text: \"Offline\",\n            status: true,\n            acknow: false,\n            dateStart: now,\n            offline_count: 0,\n            offline_timestamp: null,\n        };\n    }\n\n    // OFFLINE → ONLINE (Recovery)\n    if (\n        communications[mac].offline_streak === 0 &&\n        communications[mac].status === true\n    ) {\n        communications[mac].status = false;\n    }\n\n    /* ---------------- STREAM DATA ---------------- */\n    const streamData = streamObj?.stream?.data;\n\n    if (streamData && typeof streamData === \"object\") {\n        const devicesSetup = setup?.devices || {};\n\n        for (let deviceId in streamData) {\n            const device = devicesSetup?.[deviceId];\n            if (!device || !device.vrs) continue;\n\n            const devGen = device?.gen || {};\n            const adr = devGen.addr2;\n            const name = decodeText(devGen.name || \"\");\n            const categoryName = cate[mac][deviceId] || \"Others\";\n\n            let object = {\n                analogInput: [],\n                deviceStatus: [],\n                alarm: [],\n                digitalinput: [],\n                outputStatus: [],\n                chartDef: [],\n            };\n\n            for (let pointId in device.vrs) {\n                const point = device.vrs[pointId];\n                if (!point || point.vfr !== 1) continue;\n\n                const lng = device?.lng?.vrs?.[pointId];\n                if (!lng) continue;\n\n                let group;\n                switch (point.vgrp) {\n                    case 0: group = \"analogInput\"; break;\n                    case 1: group = \"deviceStatus\"; break;\n                    case 2: group = \"alarm\"; break;\n                    case 3: group = \"digitalinput\"; break;\n                    case 4: group = \"outputStatus\"; break;\n                    default: continue;\n                }\n\n                let point_name = decodeText(lng.uvun || lng.vun || \"\");\n                const value = streamData?.[deviceId]?.[pointId] ?? 0;\n\n                if (point.chartDef?.en === true) {\n                    object.chartDef.push({\n                        pointId,\n                        name: point_name,\n                        value,\n                        index: pointId,\n                        unit: point.vudm,\n                    });\n                }\n\n                object[group].push({\n                    pointId,\n                    name: point_name,\n                    value,\n                    unit: point.vudm,\n                });\n            }\n\n            devices[mac].push({\n                name,\n                adr,\n                cate: categoryName,\n                uid: deviceId,\n                lanid: devGen.addr1,\n                model: devGen.model,\n                dbpath: devGen.dbpath,\n                analogInput: object.analogInput,\n                deviceStatus: object.deviceStatus,\n                alarm: object.alarm,\n                digitalinput: object.digitalinput,\n                outputStatus: object.outputStatus,\n                chartDef: object.chartDef,\n            });\n        }\n    }\n\n    global.set(\"CheckCommunications\", communications);\n\n    return { devices, status_acq, obj_info };\n};\n\n/* ================= MAIN ================= */\nconst output = {};\n\nfor (let conf of (msg.payload || [])) {\n    let compares = setup_stream(conf);\n    let mac = conf.mac_address;\n\n    output[mac] = {\n        name: compares?.obj_info?.[mac]?.name || conf.xweb_name,\n        mac_address: mac,\n        on: compares?.status_acq?.[mac]?.xwebpro_on || 0,\n        branch_id: conf.branch_id,\n        devices: compares?.devices?.[mac] || []\n    };\n}\n\nmsg.payload = output;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 660,
+        "wires": [
+            [
+                "8fab82e57d439410"
+            ]
+        ]
+    },
+    {
+        "id": "231f2e3dc3faa079",
+        "type": "switch",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "property": "payload.last",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1130,
+        "y": 740,
+        "wires": [
+            [
+                "052fca7f1c50e91d"
+            ]
+        ]
+    },
+    {
+        "id": "711aab3345c7b608",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 1140,
+        "wires": [
+            [
+                "b407db6ee369605f"
+            ]
+        ]
+    },
+    {
+        "id": "b407db6ee369605f",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "function 3",
+        "func": "msg.payload = context.get(\"endpoints\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 1140,
+        "wires": [
+            [
+                "5dfb86e98242e32d"
+            ]
+        ]
+    },
+    {
+        "id": "5dfb86e98242e32d",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "39ed80a752cd7d6c",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "completed",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1750,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "89d31b367182b295",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "completed",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1990,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "e4536c0647789e87",
+        "type": "mongodb",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "topology": "dnscluster",
+        "connectOptions": "",
+        "port": 27017,
+        "db": "cj-core",
+        "name": ""
+    }
+]

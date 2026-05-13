@@ -1,0 +1,167 @@
+[
+    {
+        "id": "4671ed28b6ce36fa",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script query",
+        "func": "const payload = msg.payload;\nconst now = new Date().getTime();\nconst upsert = { upsert: true }\n\nlet updated = Object.entries(payload).map(([mac, pay]) => {\n    let filter = { mac };\n    let update = {\n        $set: {\n            [mac]: pay,\n        },\n        $currentDate: {\n            lastModified: true,\n        }\n    }\n    return [filter, update, upsert];\n});\nmsg.payload = updated;\nmsg.operation = \"updateOne\";\nmsg.collection = \"data_mapping\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1530,
+        "y": 680,
+        "wires": [
+            [
+                "cc85fe1485db7cb3"
+            ]
+        ]
+    },
+    {
+        "id": "cc85fe1485db7cb3",
+        "type": "split",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1670,
+        "y": 680,
+        "wires": [
+            [
+                "f0ed129ce548ec88"
+            ]
+        ]
+    },
+    {
+        "id": "f0ed129ce548ec88",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "20",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1820,
+        "y": 680,
+        "wires": [
+            [
+                "e20be8849cecc817"
+            ]
+        ]
+    },
+    {
+        "id": "e20be8849cecc817",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core data_mapping",
+        "x": 2040,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fa79841ea80298c4",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core data_mapping",
+        "x": 1800,
+        "y": 760,
+        "wires": [
+            [
+                "189f7bd242a5d96f"
+            ]
+        ]
+    },
+    {
+        "id": "189f7bd242a5d96f",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "convert to object",
+        "func": "let data = msg.payload;\nlet obj = {};\n\nfor (let val of data) {\n    obj[val.mac] = val[val.mac]\n}\nmsg.payload = obj;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2000,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "40cf9c4925d1817e",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "script query",
+        "func": "msg.collection = \"data_mapping\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1610,
+        "y": 760,
+        "wires": [
+            [
+                "fa79841ea80298c4"
+            ]
+        ]
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    }
+]
