@@ -1,0 +1,1652 @@
+[
+    {
+        "id": "3730def10cda8e3f",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 860,
+        "y": 80,
+        "wires": [
+            [
+                "37b70a5b97fd172c"
+            ]
+        ]
+    },
+    {
+        "id": "37b70a5b97fd172c",
+        "type": "http request",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://localhost:1880/api/xcenter/v1/all-data?action=alarm",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1030,
+        "y": 80,
+        "wires": [
+            [
+                "80c4ddf72ff99256"
+            ]
+        ]
+    },
+    {
+        "id": "80c4ddf72ff99256",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 20",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "8ae7af0185a4ac24",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "test",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 80,
+        "wires": [
+            [
+                "c18b7a84067847b0"
+            ]
+        ]
+    },
+    {
+        "id": "291d313a2e5015dd",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Stop",
+        "props": [
+            {
+                "p": "reset",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 440,
+        "wires": [
+            [
+                "37b5de65c203e7a7"
+            ]
+        ]
+    },
+    {
+        "id": "04e77ba47751c7de",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Start",
+        "props": [
+            {
+                "p": "action",
+                "v": "start",
+                "vt": "str"
+            }
+        ],
+        "repeat": "120",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "37b5de65c203e7a7"
+            ]
+        ]
+    },
+    {
+        "id": "79c24459d2d0ae92",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "function 7",
+        "func": "msg.config_url = msg.payload;\nlet endpointConfigs = msg.payload.map(x => {\n    let { mac_address, url, username, password } = x\n    let auth = {\n        auth_mode: \"standard\",\n        username,\n        password,\n    }\n    let mac = mac_address\n    let urls = {\n        sysinfo: url + \"cgi-bin/sysinfo.lua\",\n        login: url + \"cgi-bin/login.lua\",\n        stream: url + \"cgi-bin/stream.lua\",\n        getsetup: url + \"cgi-bin/getsetup.lua\"\n    }\n    return { mac, host: url, urls, auth }\n})\nmsg.payload = {\n    endpointConfigs,\n    setEnableAll: true,\n    setGetsysinfoAll: true,\n    setGetsetupAll: true,\n    processesLimited: 20,\n    requestTimeout: 20000\n}\nmsg.action = \"changeSetting\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 80,
+        "wires": [
+            [
+                "a68bba2b1ad1e9ba",
+                "37b5de65c203e7a7"
+            ]
+        ]
+    },
+    {
+        "id": "4720db9f31c05a44",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Start Test",
+        "props": [
+            {
+                "p": "action",
+                "v": "start",
+                "vt": "str"
+            },
+            {
+                "p": "test",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 120,
+        "y": 180,
+        "wires": [
+            [
+                "37b5de65c203e7a7"
+            ]
+        ]
+    },
+    {
+        "id": "3f74ee5062528964",
+        "type": "file",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "filename": "timing_logs",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 830,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c110cc923243b4ad",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 680,
+        "y": 180,
+        "wires": [
+            [
+                "3f74ee5062528964"
+            ]
+        ]
+    },
+    {
+        "id": "57aa7b5c64f11d38",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 370,
+        "y": 80,
+        "wires": [
+            [
+                "79c24459d2d0ae92"
+            ]
+        ]
+    },
+    {
+        "id": "c18b7a84067847b0",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "query",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {\n    _id: {\n        $type: 'objectId'\n    }\n}\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "57aa7b5c64f11d38"
+            ]
+        ]
+    },
+    {
+        "id": "a68bba2b1ad1e9ba",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 25",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c8fe071be18d3116",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 600,
+        "wires": [
+            [
+                "560ebd93e2a28303"
+            ]
+        ]
+    },
+    {
+        "id": "38c87812d91915ad",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "MongoDB Atlas Script",
+        "func": "let now = new Date().getTime();\n\nasync function controllerParallelLoopActive(data) {\n    for (const i of data) {\n        await new Promise(resolve => setTimeout(resolve, 1000));\n        i.note = \"\";\n        i.dateEnd = null;\n        i.dateAcknow = null;\n        msg.payload = i;\n        msg.options = {\n            ordered: true\n        }\n        msg.operation = \"insertOne\";\n        node.send(msg);\n    }\n}\n\nasync function controllerParallelLoopInActive(data) {\n    for (const i of data) {\n        await new Promise(resolve => setTimeout(resolve, 1000));\n        msg.payload = [\n            {\n                /* Where Conditions */\n                store_name: i.store_name,\n                mac_address: i.mac_address,\n                device_name: i.device_name,\n                device_adr: i.device_adr,\n                alarm_name: i.alarm_name,\n                dateStart: i.dateStart,\n            },\n            {\n                /* set update data */\n                $set: {\n                    dateEnd: i.dateEnd,\n                    note: i.note,\n                    dateAcknow: i.dateAcknow,\n                },\n                $currentDate: {\n                    lastModified: true\n                }\n            }\n        ];\n        msg.options = {\n            upsert: false,\n        }\n        msg.operation = \"updateOne\";\n        node.send(msg);\n    }\n}\n\nif (msg.OfflineShow) {\n    controllerParallelLoopActive(msg.Offline);\n}\n\nif (msg.OnlineShow) {\n    controllerParallelLoopInActive(msg.Online);\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 600,
+        "wires": [
+            [
+                "61e79ad82f0347e9"
+            ]
+        ]
+    },
+    {
+        "id": "de4c7ef0c221a7c2",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "check communications",
+        "info": "",
+        "x": 340,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "f1354eea61668f28",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Cache config endpoint ",
+        "info": "",
+        "x": 340,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "75524317a15ad2ba",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "mongodb atlas",
+        "info": "",
+        "x": 860,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "e3e1c6835893caa8",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "120",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 940,
+        "wires": [
+            [
+                "f5d39b30f9684ec4"
+            ]
+        ]
+    },
+    {
+        "id": "26702b76c13345f5",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Available States",
+        "info": "",
+        "x": 300,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "7aaa3195998f68d7",
+        "type": "link in",
+        "z": "9e5d9fa8c426baa4",
+        "name": "to Available States",
+        "links": [
+            "2c90e6f05248bb33"
+        ],
+        "x": 185,
+        "y": 980,
+        "wires": [
+            [
+                "f5d39b30f9684ec4"
+            ]
+        ]
+    },
+    {
+        "id": "f5d39b30f9684ec4",
+        "type": "trigger",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "payl",
+        "duration": "2",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 280,
+        "y": 940,
+        "wires": [
+            [
+                "8d924eac506507ca"
+            ]
+        ]
+    },
+    {
+        "id": "29e6e543a705c744",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn:MDB Upsert Active|Inactive Payload",
+        "func": "/* Date Now */\nlet now = new Date().getTime();\nconst upsert = { upsert: true };\n// const alarms = [...msg.Active || [], ...msg.Stop || []]; //เราจะ upsert ดังนั้นไม่ต้องแยก\nconst alarms = msg.payload||[]\n\nlet documents = alarms.map(a => {\n    let { mac_address, device_adr, dateStart, alarm_name } = a;\n    let filter = { mac_address, device_adr, dateStart, alarm_name };\n    let update = {\n        $set: a,\n        $currentDate: {\n            lastModified: true,\n        }\n    }\n    return [filter, update, upsert];\n})\n\nmsg.payload = documents;\nmsg.operation = \"updateOne\";\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 820,
+        "wires": [
+            [
+                "c2b8216354a1059b"
+            ]
+        ]
+    },
+    {
+        "id": "e2e8388ea4c699ad",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: Filter Only Changed Process",
+        "func": "let processStatus = global.get(\"ProcessStatus\");\n\nlet processStatus_prev = global.get(\"ProcessStatus_prev\");\nif (!processStatus_prev) {\n    global.set(\"ProcessStatus_prev\", {});\n    processStatus_prev = global.get(\"ProcessStatus_prev\");\n}\n\nObject.entries(processStatus).forEach(([ka, a]) => {\n    let stampedProc = a.process.filter((p => p.timestamp));\n    let changedProc = [];\n    if (!processStatus_prev[ka]) {\n        processStatus_prev[ka] = { ...processStatus[ka] };\n        processStatus_prev[ka].stampedProc = [];\n    } else {\n        processStatus_prev[ka].stampedProc = stampedProc;\n    }\n    let stampedLabels_prev = processStatus_prev[ka].stampedProc.map((p) => p.label);\n    changedProc = stampedProc.filter((p) => !stampedLabels_prev.includes(p.label));\n    processStatus_prev[ka].changedProc = changedProc;\n    processStatus_prev[ka].process = a.process.reduce((p, v) => {\n        p[v.label] = v;\n        return p;\n    }, {});\n});\nmsg.payload = Object.values(processStatus_prev).filter(al => al.changedProc.length > 0)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 880,
+        "wires": [
+            [
+                "4953d7557e3eab1e"
+            ]
+        ]
+    },
+    {
+        "id": "4953d7557e3eab1e",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: MDB Changed Process",
+        "func": "\nconst upsert = { upsert: true };\nconst alarms = msg.payload;\n\nlet documents = alarms.map((al) => {\n    let { mac_address, device_adr, dateStart, alarm_name } = al;\n    let filter = { mac_address, device_adr, dateStart, alarm_name };\n    let { changedProc, stampedProc, ...rest } = al;\n    let update = {\n        $set: rest,\n        $currentDate: {\n            lastModified: true,\n        }\n    }\n    return [filter, update, upsert];\n});\nmsg.payload = documents;\nmsg.operation = \"updateOne\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 920,
+        "wires": [
+            [
+                "c2b8216354a1059b"
+            ]
+        ]
+    },
+    {
+        "id": "c2b8216354a1059b",
+        "type": "split",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1030,
+        "y": 860,
+        "wires": [
+            [
+                "cdab25adb8627b35"
+            ]
+        ]
+    },
+    {
+        "id": "cdab25adb8627b35",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "15",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1180,
+        "y": 860,
+        "wires": [
+            [
+                "49f0972f505fac9c"
+            ]
+        ]
+    },
+    {
+        "id": "a12e04216c6051a3",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Set Empty process ALL DOCUMENTS !",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 1020,
+        "wires": [
+            [
+                "b149d5a179376e9e"
+            ]
+        ]
+    },
+    {
+        "id": "cdebcd9f1e21a105",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn:MDB Clear All Process",
+        "func": "\nconst upsert = { upsert: false }\n\nlet filter = {} // all document\nlet update = {\n    $set: {\n        process: {}// original is []\n    },\n    $currentDate: {\n        lastModified: true\n    }\n}\n\n\nmsg.payload = [[filter, update, upsert]]\nmsg.operation = \"updateMany\"\nglobal.set(\"ProcessStatus_prev\",{})\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 1020,
+        "wires": [
+            [
+                "c2b8216354a1059b"
+            ]
+        ]
+    },
+    {
+        "id": "b149d5a179376e9e",
+        "type": "trigger",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "payl",
+        "duration": "10",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 570,
+        "y": 1020,
+        "wires": [
+            [
+                "cdebcd9f1e21a105"
+            ]
+        ]
+    },
+    {
+        "id": "8d59e9411604017d",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "CANCEL!! CANCEL!! CANCEL!!",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "reset",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 310,
+        "y": 1060,
+        "wires": [
+            [
+                "b149d5a179376e9e"
+            ]
+        ]
+    },
+    {
+        "id": "648d469ddfa22bea",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Alarm Rules",
+        "func": "let xgetsetup = global.get(\"xgetsetup\")\n\nconst values = (obj) => obj ? Object.values(obj) : []\nconst keys = (obj) => obj ? Object.keys(obj) : []\nconst entries = (obj) => obj ? Object.entries(obj) : []\n//\nlet result = {}\nlet error = {}\nentries(xgetsetup).forEach(([m,xweb]) => {\n    let { setup_data } = xweb;\n    if(!setup_data){\n        error[m] = xweb\n        return;      \n    }\n    let { devices, setup } = setup_data;\n    values(devices).forEach(d=>d.alarm_rule=\"default\");\n    for (let alarm_rule of context.ALARM_RULES) {\n\n        let { name = \"default\", dev_rules = {} } = alarm_rule\n        \n        values(devices).forEach(dev => {\n            if(dev.alarm_rule!==\"default\") return;\n            // dev.test = {}\n            // dev.reg={}\n            let {gen,test={},reg={}} = dev;\n            let all_matched = true;\n            for (let [field, regex] of entries(dev_rules)) {\n                all_matched = all_matched && regex.test(gen[field])\n                if(!all_matched){\n                    break;\n                }\n                // test[field] = regex.test(gen[field])\n                // reg[field] = regex\n            }\n            if (all_matched) {\n                dev.alarm_rule = name\n            }\n        })\n    }\n})\n\nmsg.payload = {result,error}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\nglobal.get(\"alarmrules\") || global.set(\"alarmrules\", []);\nglobal.set(\"alarmrules\", []);//test\n\ncontext.ALARM_RULES = global.get(\"alarmrules\")\n\nfunction escapeRegex(string) {\n    return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n}\n\nlet ac2025_rule =\n{\n    name: \"ac2025\",\n    ctgs:{\n        term:\"\"\n    },\n    dev_rules: {\n        // \"custom_properties\": \"\",\n        // \"devcom\": \"/dev/RS485_1\",\n        // \"dcl\": \"dixelldev\",\n        // \"addr1\": \"RS1\",\n        // \"dbpath\": \"/dixell/00F0/000B/0002/iPro-Step-AirDefault-Control/\",\n        // \"uiddev\": \"1\",\n        // \"addr\": \"RS1-222\",\n        // \"desc\": \"\",\n        \"addr2\": \"222\",\n        // \"code\": {\n        //     \"ver\": \"000B\",\n        //     \"e2\": \"0002\",\n        //     \"fam\": \"00F0\"\n        // },\n        //  \"dstp\": \"1,9600,n,8,1,30,5,5\",\n        // \"model\": \"iPro-Step-AirDefault-Control\",\n        // \"en\": \"1\",\n        // \"name\": \"iPro-Step-AirDefault-Control\",\n        // \"serial\": {\n        //     \"1\": {\n        //         \"parity\": \"n\",\n        //         \"stopbit\": \"1\",\n        //         \"dtron\": \"5\",\n        //         \"speed\": \"9600\",\n        //         \"length\": \"8\",\n        //         \"dtroff\": \"5\",\n        //         \"interframe\": \"30\"\n        //     }\n        // },\n    }\n\n}\n\nObject.entries(ac2025_rule.dev_rules).forEach(([field,text])=>{\n    let regtext = escapeRegex(text)\n    ac2025_rule.dev_rules[field] = new RegExp(regtext,'i')\n})\n\ncontext.ALARM_RULES.push(ac2025_rule)",
+        "finalize": "",
+        "libs": [],
+        "x": 1250,
+        "y": 280,
+        "wires": [
+            [
+                "8e5436f8c07449bf",
+                "79b13c21f5ab790e"
+            ]
+        ]
+    },
+    {
+        "id": "eb6c5756657ab1bc",
+        "type": "link out",
+        "z": "9e5d9fa8c426baa4",
+        "name": "After Core Completed",
+        "mode": "link",
+        "links": [
+            "ee27cc27dd70b680"
+        ],
+        "x": 715,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "3b820ef8d8e586b3",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "After Core Completed",
+        "info": "",
+        "x": 860,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "b8bf6a2b9691a38b",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "xgetsetup process *Need Trigger",
+        "info": "",
+        "x": 1310,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "ee27cc27dd70b680",
+        "type": "link in",
+        "z": "9e5d9fa8c426baa4",
+        "name": "xstream process",
+        "links": [
+            "eb6c5756657ab1bc"
+        ],
+        "x": 1085,
+        "y": 340,
+        "wires": [
+            [
+                "f099f22b3e6483cb"
+            ]
+        ]
+    },
+    {
+        "id": "de37268663a64d5a",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1100,
+        "y": 240,
+        "wires": [
+            [
+                "648d469ddfa22bea"
+            ]
+        ]
+    },
+    {
+        "id": "8e5436f8c07449bf",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 23",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1420,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "73000950dc1e0e9a",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "xstream process",
+        "info": "",
+        "x": 1260,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "6c3856bcd55f60a9",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1080,
+        "y": 400,
+        "wires": [
+            [
+                "f099f22b3e6483cb"
+            ]
+        ]
+    },
+    {
+        "id": "79b13c21f5ab790e",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Generate Alarms from Setup",
+        "func": "let xgetsetup = global.get(\"xgetsetup\")\nlet xstream = global.get(\"xstream\")\n\nconst values = (obj) => obj ? Object.values(obj) : []\nconst keys = (obj) => obj ? Object.keys(obj) : []\nconst entries = (obj) => obj ? Object.entries(obj) : []\n\nlet xalarms = global.get(\"xalarms\")\nlet errors = []\nlet xactive = []\nvalues(xgetsetup).forEach(xweb => {\n    let { setup_data } = xweb\n    if (!setup_data) return;\n    let { mac } = setup_data\n    let devices = {}\n    values(setup_data.devices).forEach(dev => {\n        let { gen, vrs,lng, alarm_rule } = dev\n        if (!gen.en) return;\n        devices[gen.uiddev] = { alarm_rule, alarms: {},active_alarms:[] }\n        let out_dev = devices[gen.uiddev]\n        entries(vrs).forEach(v => {\n            v[1].vfr && v[1].vgrp == 2 && (\n                v[1].name=lng?.vrs[v[0]]?.uvun||lng?.vrs[v[0]]?.vun ,\n                out_dev.alarms[v[0]] = v[1]);\n        })\n    })\n    xalarms[mac] = {\n        mac,\n        devices,\n        active_devices: []\n    }\n})\nmsg.payload = { xalarms, xactive, errors }\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\nglobal.get(\"xalarms\") || global.set(\"xalarms\",{})",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 320,
+        "wires": [
+            [
+                "99d8795b16580c9d"
+            ]
+        ]
+    },
+    {
+        "id": "99d8795b16580c9d",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 34",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1540,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "f099f22b3e6483cb",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Inject Default Alarms",
+        "func": "let xstream = global.get(\"xstream\") || {}\nlet xalarms = global.get(\"xalarms\") || {}\n\nconst keys = (obj) => Object.keys(obj)\nconst values = (obj) => Object.values(obj)\nconst entries = (obj) => Object.entries(obj)\n\nlet { xactive = {}, errors = [] } = msg.payload;\nvalues(xalarms).forEach(xweb => {\n    xweb.active_devices = []\n    let { mac, devices, active_devices } = xweb\n    let { stream_data } = xstream[mac];\n    if (!stream_data) { errors.push({ reason: \"stream_data missing\", mac }); return; }\n    let { stream } = stream_data;\n    if (!stream) { errors.push({ reason: \"stream missing\", mac }); return; }\n    let { data, acq } = stream;\n    if (!data || !acq) { errors.push({ reason: \"data missing\", mac }); return; }\n\n    entries(devices)\n        .forEach(([devk, devv]) => {\n            if (devv.alarm_rule !== \"default\") return;\n            if (!acq) return;\n            // Cancel\n            // devv.virtual_alarms||(devv.virtual_alarms={});\n            let { virtual_alarms } = devv\n            devv.active_alarms = []\n\n            entries(devv.alarms).forEach(([pointId, point]) => {\n                point.error = 0\n                try {\n                    point.value = data[devk][pointId];\n                    point.en = 1;\n                } catch {\n                    point.error = 1\n                    errors.push({ reason: \"point missing\", mac, devk, point })\n                }\n                // Cancel\n                // virtual_alarms[pointId] = point\n                // virtual_alarms[pointId].value && (active.push(pointId))\n                point.value && devv.active_alarms.push(pointId)\n            })\n            // devv.active_alarms = active_alarms\n            devv.active_alarms.length && active_devices.push(devk);\n        });\n    !xactive[mac] && (active_devices.length > 0) && (xactive[mac] = !0);\n})\n\nmsg.payload = { xalarms, xactive, active_xwebs: keys(xactive), errors }\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 400,
+        "wires": [
+            [
+                "d56aa6e2705a1204",
+                "234ad776b74eaf23"
+            ]
+        ]
+    },
+    {
+        "id": "d56aa6e2705a1204",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 36",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1500,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "155de75c081ca824",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 37",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1480,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "49f0972f505fac9c",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "alarmlogs",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core-alarmlogs",
+        "x": 1390,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "61e79ad82f0347e9",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "communicationlogs",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "cj-core-communicationlogs",
+        "x": 780,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0f7a334dd21799b1",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "reset",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 360,
+        "wires": [
+            [
+                "37b5de65c203e7a7"
+            ]
+        ]
+    },
+    {
+        "id": "37b5de65c203e7a7",
+        "type": "trigger",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "0",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "0df4bcec30b4de4c"
+            ]
+        ]
+    },
+    {
+        "id": "bb4cb1f75266233c",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "force start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "action",
+                "v": "start",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 460,
+        "wires": [
+            [
+                "0df4bcec30b4de4c"
+            ]
+        ]
+    },
+    {
+        "id": "aeca66b33ddd5a94",
+        "type": "link in",
+        "z": "9e5d9fa8c426baa4",
+        "name": "trigger xweb core",
+        "links": [
+            "37dd1b20be544c12"
+        ],
+        "x": 45,
+        "y": 40,
+        "wires": [
+            [
+                "dba9312a8df00a8a"
+            ]
+        ]
+    },
+    {
+        "id": "dba9312a8df00a8a",
+        "type": "delay",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 140,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "560ebd93e2a28303",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Communications",
+        "func": "let communications = global.get(\"CheckCommunications\") || {};\nlet offline = global.get(\"Offline\") || {};\n\nlet Online = {};\nlet Offline = {};\nObject.entries(communications).forEach(([mac, item]) => {\n    item.status = item.status > 0 ? true : false || item.status;\n    if (item.status) {\n        if (!offline[mac]) {\n            node.status({ fill: \"red\", shape: \"dot\", text: \"Offline \" + item.store_name })\n            Offline[mac] = {\n                store_name: item.store_name,\n                mac_address: item.mac_address,\n                device_name: item.device_name,\n                device_adr: item.device_adr,\n                alarm_name: item.alarm_name,\n                note: item.text || \"\",\n                acknow: item.acknow,\n                dateStart: item.dateStart,\n                dateAcknow: null,\n                dateEnd: null,\n            }\n            offline[mac] = Offline[mac];\n        }\n    } else {\n        if (offline[mac]) {\n            node.status({ fill: \"green\", shape: \"dot\", text: \"Online \" + item.store_name })\n            Online[mac] = {\n                ...offline[mac],\n                note: offline[mac]?.acknow == true ? (offline[mac]?.text !== \"Acknowledged\" ? offline[mac]?.text : \"Acknowledged\") : \"Normal\",\n                acknow: item.acknow,\n                dateAcknow: offline[mac]?.acknow == true ? (offline[mac].dateAcknow == null ? new Date().getTime() : offline[mac]?.dateAcknow) : new Date().getTime(),\n                dateEnd: new Date().getTime(),\n            }\n            offline[mac] = Online[mac];\n            delete offline[mac];\n        }\n    }\n});\n\nif (Object.keys(Offline).length > 0 || Object.keys(Online).length > 0) {\n    var Data = {\n        Offline: Object.values(Offline),\n        OfflineShow: Object.values(Offline).length > 0 ? true : false,\n\n        Online: Object.values(Online),\n        OnlineShow: Object.values(Online).length > 0 ? true : false,\n    }\n    global.set(\"Offline\", offline);\n}\nreturn [Data];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 600,
+        "wires": [
+            [
+                "38c87812d91915ad"
+            ]
+        ]
+    },
+    {
+        "id": "096608bc3f25e3cf",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "clear note.note",
+        "func": "let chk = global.get(\"chk_watch\") || {};\nObject.entries(chk).forEach(([key, values]) => {\n    if (values?.note?.note) {\n        chk[key].note = values.note.note.trim();\n    }\n})\nglobal.set(\"chk_watch\", chk)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c27fbd4df71ba43c",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 12 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1120,
+        "wires": [
+            [
+                "096608bc3f25e3cf"
+            ]
+        ]
+    },
+    {
+        "id": "8d924eac506507ca",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: Available States",
+        "func": "global.get(\"ProcessStatus\") || global.set(\"ProcessStatus\", {})\nlet process_status = global.get(\"ProcessStatus\") || {};\nlet xalarms = global.get(\"xalarms\") || {};\nlet xgetsetup = global.get(\"xgetsetup\") || {};\nlet xsysinfo = global.get(\"xsysinfo\") || {};\n\n\nif (msg.setLevelsDef) {\n    // สำหรับมาเปลี่ยนทีหลัง หรือ กลางทาง\n    context.levelsDef = msg.setLevelsDef;\n}\n\nlet { levelsDef, available_states } = context;\nlet xstream = global.get(\"xstream\") || {};\nconst values = (obj) => Object.values(obj)\nconst keys = (obj) => Object.keys(obj)\nconst entries = (obj) => Object.entries(obj)\nconst getSetup = (xweb) => xweb.setup_data\nconst getSysinfo = (xweb) => xweb.sysinfo_data\nconst decode = (text) => decodeURIComponent(text)\n\nfor (let [mac, active_xweb] of entries(xalarms)) {\n    if (active_xweb.active_devices.length == 0) continue;\n    let setup_xweb = getSetup(xgetsetup[mac]) || {}\n    let sysinfo_xweb = getSysinfo(xsysinfo[mac]) || {}\n    let { devices } = active_xweb\n    let alarm_devices = entries(devices).filter(([, d]) => d.active_alarms.length)\n    let { stream_data } = xstream[mac]\n    if (!stream_data) continue;\n    let serverTime = new Date().getTime()\n    let { stream } = stream_data, { ts: localTime } = stream || {};\n    (localTime && (localTime *= 1000)) || (!localTime && (localTime = serverTime));\n    for (let [did, dev] of alarm_devices) {\n        let def_dev = levelsDef[setup_xweb.devices[did]?.gen.name] || {};\n        let alarms = entries(dev.alarms)\n            .map(([pointId, point]) => { return { pointId, ...point } })\n            .filter(a => a.en)\n        for (let al of alarms) {\n            let index = `${mac}_${did}_${al.pointId}`;\n            let level = def_dev[al.pointId]?.level ? parseInt(def_dev[al.pointId]?.level) : 3;\n            al.value = al.value > 0 ? true : false;\n\n            if (al.value) {\n                if (!process_status[index]) {\n                    let activePayload = {\n                        store_name: decode(sysinfo_xweb.info.name),\n                        mac_address: mac,\n                        device_name: decode(setup_xweb.devices[did]?.gen.name),\n                        device_adr: setup_xweb.devices[did]?.gen.addr2,\n                        uid: setup_xweb.devices[did]?.gen.uiddev,\n                        alarm_name: decode(al.name),\n                        point_id: al.pointId,\n                        value: true,\n                        level: level,\n                        dateStart: serverTime,\n                        localTime,\n                        process: available_states.map((item, i) => {\n                            let includes_label = (item.label).includes(\"alarm_created\");\n                            let split_label = parseInt((item.label).split(\"lv\")[1]);\n                            return {\n                                id_arr: i,\n                                index: index,\n                                label: item.label,\n                                showLabel: item.showLabel,\n                                status: (includes_label ? split_label !== undefined ? split_label == level : level ? true : false : false) ? true : false,\n                                statusShow: true,\n                                timestamp: split_label == level ? process_status[index] ? process_status[index]?.dateStart : serverTime : null,\n                            }\n                        })\n                    }\n                    process_status[index] = activePayload;\n                } else {\n                    if (!(process_status[index].value)) {\n                        let hasKeyActive = {\n                            ...process_status[index],\n                            value: true,\n                            level: level,\n                            dateStart: serverTime,\n                            localTime,\n                            process: available_states.map((item, i) => {\n                                let includes_label = (item.label).includes(\"alarm_created\");\n                                let split_label = parseInt((item.label).split(\"lv\")[1]);\n                                return {\n                                    id_arr: i,\n                                    index: index,\n                                    label: item.label,\n                                    showLabel: item.showLabel,\n                                    status: (includes_label ? split_label !== undefined ? split_label == level : level ? true : false : false) ? true : false,\n                                    statusShow: true,\n                                    timestamp: split_label == level ? process_status[index] ? process_status[index]?.dateStart : serverTime : null,\n                                }\n                            })\n                        }\n                        process_status[index] = hasKeyActive;\n                    }\n                }\n            } else {\n                if (process_status[index] && process_status[index].value) {\n                    process_status[index].value = false;\n                    process_status[index].process = (process_status[index].process).map((item, i) => {\n                        return {\n                            id_arr: i,\n                            index: index,\n                            label: item?.label,\n                            showLabel: item?.showLabel,\n                            status: item?.status,\n                            statusShow: item?.statusShow,\n                            timestamp: item?.timestamp,\n                        }\n                    })\n                }\n            }\n        }\n    }\n}\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\n// ตอนนี้ใช้ device_name บน XWEB อยู่ ซึ่งไม่ practical\ncontext.levelsDef = {\n    \"MT CDU (Techno B) Adr.41\": {\n        1: { label: \"1ow Superheat\", level: \"1\" },\n        12: { label: \"IPM Over Current\", level: \"1\" },\n        13: { label: \"Fail To Drive\", level: \"1\" },\n        14: { label: \"Compressor Over Current\", level: \"3\" },\n        15: { label: \"Phase 1ost\", level: \"1\" },\n        16: { label: \"IPM Sample Failure\", level: \"\" },\n        17: { label: \"Fin Overheat\", level: \"2\" },\n        18: { label: \"Precharge Failure\", level: \"\" },\n        19: { label: \"Bus Over Voltage\", level: \"1\" },\n        20: { label: \"Bus Under Voltage\", level: \"1\" },\n        21: { label: \"Power Input Abnormal\", level: \"1\" },\n        22: { label: \"Input Over Current\", level: \"\" },\n        23: { label: \"Input Voltage Sample Failure\", level: \"\" },\n        24: { label: \"IPM Temperature Sensor Fault\", level: \"3\" },\n        27: { label: \"Outer Coil NTC Fault\", level: \"\" },\n        28: { label: \"Ambient NTC Fault\", level: \"1\" },\n        29: { label: \"Suction NTC Fault\", level: \"3\" },\n        30: { label: \"Discharge NTC Fault\", level: \"3\" },\n        34: { label: \"Communication Abnormal\", level: \"1\" },\n        40: { label: \"Discharge T Over Fault\", level: \"3\" },\n        41: { label: \"Discharge T Over 2imit\", level: \"2\" },\n        42: { label: \"Condenser T Over Fault\", level: \"\" },\n        43: { label: \"Condenser T Over imit\", level: \"\" },\n        44: { label: \"HP Switch Trig\", level: \"3\" },\n        45: { label: \"3P Switch Trig\", level: \"3\" },\n        46: { label: \"Between Input and Output too High Fadelta\", level: \"\" },\n        47: { label: \"Between Input and Output too High idelta\", level: \"\" },\n        48: { label: \"Inverter No Communication\", level: \"3\" },\n        50: { label: \"Suction Pressure Sensor Fault\", level: \"3\" },\n        51: { label: \"Discharge Pressure Sensor Fault\", level: \"\" },\n        52: { label: \"Reserve Pressure Sensor Fault\", level: \"\" },\n        53: { label: \"Humidity Sensor Fault\", level: \"\" },\n        100000: { label: \"No-ink\", level: \"\" }\n    },\n    \"Open Showcase (XR77CX) Add.11\": {\n        45: { label: \"Open door\", level: \"\" },\n        47: { label: \"ErrorPb1\", level: \"3\" },\n        48: { label: \"ErrorPb2\", level: \"3\" },\n        51: { label: \"High temp alarm\", level: \"1\" },\n        52: { label: \"1ow temp alarm\", level: \"1\" },\n        56: { label: \"RTC Error\", level: \"1\" },\n        100000: { label: \"No-ink\", level: \"\" },\n    },\n    \"Open Showcase (XR77CX) Add.12\": {\n        45: { label: \"Open door\", level: \"\" },\n        47: { label: \"ErrorPb1\", level: \"3\" },\n        48: { label: \"ErrorPb2\", level: \"3\" },\n        51: { label: \"High temp alarm\", level: \"1\" },\n        52: { label: \"1ow temp alarm\", level: \"1\" },\n        56: { label: \"RTC Error\", level: \"1\" },\n        100000: { label: \"No-ink\", level: \"\" },\n    },\n    \"Walk in (XR77CX) Add.51\": {\n        45: { label: \"Open door\", level: \"\" },\n        47: { label: \"ErrorPb1\", level: \"3\" },\n        48: { label: \"ErrorPb2\", level: \"3\" },\n        51: { label: \"High temp alarm\", level: \"1\" },\n        52: { label: \"1ow temp alarm\", level: \"1\" },\n        56: { label: \"RTC Error\", level: \"1\" },\n        100000: { label: \"No-ink\", level: \"\" },\n    },\n    \"iPro-Step-AirDefault-Control\": {\n        77: { label: \"Air No.1 Alarm (See Code 1)\", level: \"2\" },\n        78: { label: \"Air No.1 Alarm (See Code 2)\", level: \"2\" },\n        79: { label: \"Air No.2 Alarm (See Code 1)\", level: \"2\" },\n        80: { label: \"Air No.2 Alarm (See Code 2)\", level: \"2\" },\n        81: { label: \"Air No.3 Alarm (See Code 1)\", level: \"2\" },\n        82: { label: \"Air No.3 Alarm (See Code 2)\", level: \"2\" },\n        83: { label: \"Air No.4 Alarm (See Code 1)\", level: \"2\" },\n        84: { label: \"Air No.4 Alarm (See Code 2)\", level: \"2\" },\n        151: { label: \"Air No.5 Alarm (See Code 1)\", level: \"2\" },\n        152: { label: \"Air No.5 Alarm (See Code 2)\", level: \"2\" },\n        153: { label: \"Air No.6 Alarm (See Code 1)\", level: \"2\" },\n        154: { label: \"Air No.6 Alarm (See Code 2)\", level: \"2\" },\n        100000: { label: \"No-2ink\", level: \"2\" },\n    }\n}\n\ncontext.available_states = [\n    {\n        id_arr: 0,\n        label: \"alarm_created_lv1\",\n        showLabel: \"ALARM เลเวล 1\",\n    },\n    {\n        id_arr: 1,\n        label: \"alarm_created_lv2\",\n        showLabel: \"ALARM เลเวล 2\",\n    },\n    {\n        id_arr: 2,\n        label: \"alarm_created_lv3\",\n        showLabel: \"ALARM เลเวล 3\",\n    },\n    {\n        id_arr: 3,\n        label: \"alarm_confirmed_lv1\",\n        showLabel: \"ยืนยัน ALARM เลเวล 1\",\n    },\n    {\n        id_arr: 4,\n        label: \"alarm_confirmed_lv2\",\n        showLabel: \"ยืนยัน ALARM เลเวล 2\",\n    },\n    {\n        id_arr: 5,\n        label: \"alarm_confirmed_lv3\",\n        showLabel: \"ยืนยัน ALARM เลเวล 3\",\n    },\n    {\n        id_arr: 6,\n        label: \"alarm_rejected\",\n        showLabel: \"ปฏิเสธ ALARM\",\n    },\n    {\n        id_arr: 7,\n        label: \"task_created\",\n        showLabel: \"สร้าง Task งาน\",\n    },\n    {\n        id_arr: 8,\n        label: \"task_progress_started\",\n        showLabel: \"ความคืบหน้าของงานเริ่มต้นแล้ว\",\n    },\n    {\n        id_arr: 9,\n        label: \"task_resolved\",\n        showLabel: \"งานที่ได้รับการแก้ปัญหาแล้ว\",\n    },\n    {\n        id_arr: 10,\n        label: \"task_closed\",\n        showLabel: \"ปิดงาน\",\n    },\n];",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 940,
+        "wires": [
+            [
+                "e2e8388ea4c699ad"
+            ]
+        ]
+    },
+    {
+        "id": "aa720508f1cab62f",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "900",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "updated",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 700,
+        "wires": [
+            [
+                "025573b3c6b18ef0"
+            ]
+        ]
+    },
+    {
+        "id": "025573b3c6b18ef0",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "endpoints",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 700,
+        "wires": [
+            [
+                "541b4420ab0679d4"
+            ]
+        ]
+    },
+    {
+        "id": "541b4420ab0679d4",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "endpoints",
+        "x": 480,
+        "y": 700,
+        "wires": [
+            [
+                "24cbfe31e9314a9a"
+            ]
+        ]
+    },
+    {
+        "id": "24cbfe31e9314a9a",
+        "type": "change",
+        "z": "9e5d9fa8c426baa4",
+        "name": "msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config_url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 610,
+        "y": 700,
+        "wires": [
+            [
+                "0304cb392e24b8c4"
+            ]
+        ]
+    },
+    {
+        "id": "0304cb392e24b8c4",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "set cache config",
+        "func": "if (msg.topic == \"updated\") {\n    context.set(\"config_url\", msg.config_url);\n    node.status({ fill: \"green\", shape: \"ring\", text: \"updated...\" });\n    return null;\n}\nif (msg.topic == \"get\") {\n    node.status({ fill: \"yellow\", shape: \"ring\", text: \"get data...\" });\n    msg.config_url = context.get(\"config_url\");\n    node.status({ fill: \"blue\", shape: \"ring\", text: \"completed \" + msg.config_url.length });\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 760,
+        "wires": [
+            [
+                "c024b79fbff997ed"
+            ]
+        ]
+    },
+    {
+        "id": "67d1483fc3c28f9a",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "get",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 760,
+        "wires": [
+            [
+                "0304cb392e24b8c4"
+            ]
+        ]
+    },
+    {
+        "id": "58e4eced7e150cbb",
+        "type": "exec",
+        "z": "9e5d9fa8c426baa4",
+        "command": "cat /root/.pm2/logs/Private-Node-RED-error.log",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 930,
+        "y": 500,
+        "wires": [
+            [
+                "7a95c7081c21aebc"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6a1081bb637dad9f",
+        "type": "http in",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "url": "/settings",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 650,
+        "y": 500,
+        "wires": [
+            [
+                "58e4eced7e150cbb"
+            ]
+        ]
+    },
+    {
+        "id": "7a95c7081c21aebc",
+        "type": "http response",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "c7774a9e834d3d92",
+        "type": "catch",
+        "z": "9e5d9fa8c426baa4",
+        "name": "",
+        "scope": [
+            "234ad776b74eaf23"
+        ],
+        "uncaught": false,
+        "x": 1690,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c024b79fbff997ed",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "tn: Active Alarms",
+        "func": "const Active_Alarms = global.get(\"Active_Alarms\") || {};\nlet xalarms = global.get(\"xalarms\") || {};\nlet xstream = global.get(\"xstream\") || {};\nlet xgetsetup = global.get(\"xgetsetup\") || {};\nlet xsysinfo = global.get(\"xsysinfo\") || {};\n\nconst chk_watch = global.get(\"chk_watch\") || {};\nconst values = (obj) => Object.values(obj);\nconst keys = (obj) => Object.keys(obj);\nconst entries = (obj) => Object.entries(obj);\nconst getSetup = (xweb) => xweb.setup_data;\nconst getSysinfo = (xweb) => xweb.sysinfo_data;\nconst decode = (text) => decodeURIComponent(text);\n\nlet Active = {};\nlet Stop = {};\n\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nlet config = msg.config_url;\nconst compareVendor = (mac) => {\n    if (!config) return;\n    return config.find((x) => x.mac_address == mac);\n}\n\nfor (let [mac, active_xweb] of entries(xalarms)) {\n    let setup_xweb = getSetup(xgetsetup[mac]) || {}\n    let sysinfo_xweb = getSysinfo(xsysinfo[mac]) || {}\n    let { devices } = active_xweb\n    let { stream_data } = xstream[mac]\n    if (!stream_data) continue;\n    let serverTime = new Date().getTime()\n    let { stream } = stream_data, { ts: localTime } = stream || {};\n\n    (localTime && (localTime *= 1000)) || (!localTime && (localTime = serverTime));\n    for (let [did, dev] of entries(devices)) {\n        let alarms = entries(dev.alarms)\n            .map(([pointId, point]) => { return { pointId, ...point } })\n            .filter(a => a.en)\n        for (let al of alarms) {\n            let index = `${mac}_${did}_${al.pointId}`;\n            al.value = al.value > 0 ? true : false;\n\n            let vendor = compareVendor(mac);\n\n            // Case 1: Alarm Active\n            if (al.value) {\n\n                // node.status({ fill: \"red\", shape: \"ring\", text: \"Active \" + decode(al.name) + \" [\" + vendor.owner + \"]\" });\n                if (!Active_Alarms[index]) {\n                    Active[index] = {\n                        store_name: decode(sysinfo_xweb.info.name),\n                        mac_address: mac,\n                        vendor: vendor.owner,\n                        device_name: decode(setup_xweb.devices[did].gen.name),\n                        device_adr: setup_xweb.devices[did].gen.addr2,\n                        device_type: context.getDeviceType(decode(setup_xweb.devices[did].gen.name)),//tn:\n                        uid: did,\n                        alarm_name: decode(al.name),\n                        dateStart: localTime,\n                        value: true,\n                    }\n                    Active_Alarms[index] = Active[index];\n                } else {\n                    if (!(Active_Alarms[index].value)) {\n                        Active_Alarms[index].vendor = vendor.owner;\n                        Active_Alarms[index].dateStart = localTime;\n                        Active_Alarms[index].value = true;\n                        Active[index] = Active_Alarms[index]\n                    }\n                }\n            } else {\n                if (Active_Alarms[index]) {\n                    if (Active_Alarms[index].value) {\n                        // node.status({ fill: \"green\", shape: \"ring\", text: \"Stop \" + decode(al.name) + \" [\" + vendor.owner + \"]\" });\n\n                        Active_Alarms[index] = {\n                            ...Active_Alarms[index],\n                            value: false,\n                            dateEnd: serverTime,\n                            note: chk_watch[index]?.acknow > 0 ? chk_watch[index]?.note : (chk_watch[index]?.note !== \"Acknow\") ? \"Normal\" : \"Startup\",\n                            dateAcknow: chk_watch[index]?.timestamp,\n                        };\n                        Stop[index] = Active_Alarms[index]\n                        delete chk_watch[index];\n                    } else {\n                        if (Active_Alarms[index].dateEnd) {\n                            // clear cache every 7 days\n                            let diff = serverTime - Active_Alarms[index].dateEnd;\n                            if (diff > SEVEN_DAYS) {\n                                delete Active_Alarms[index];\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n}\nmsg.payload = [...Object.values(Active), ...Object.values(Stop)]\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\nglobal.get(\"Active_Alarms\") || global.set(\"Active_Alarms\",{});\nglobal.get(\"chk_watch\") || global.set(\"chk_watch\",{});\n\n\ncontext.getDeviceType = (name) => {\n    if (/showcase/i.test(name)) {\n        return \"Showcase\"\n    } else if (/cdu/i.test(name)) {\n        return \"CDU\"\n    } if (/air/i.test(name)) {\n        return \"Aircon\"\n    } else {\n        return \"Unknown\"\n    }\n}\n",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 760,
+        "wires": [
+            [
+                "29e6e543a705c744"
+            ]
+        ]
+    },
+    {
+        "id": "09d59784faa78ad9",
+        "type": "inject",
+        "z": "9e5d9fa8c426baa4",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 2040,
+        "wires": [
+            [
+                "f863cb4e247b6a58"
+            ]
+        ]
+    },
+    {
+        "id": "f863cb4e247b6a58",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "endpoints",
+        "func": "msg.collection = \"endpoints\";\nmsg.payload = {};\nmsg.operation = \"find\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 2040,
+        "wires": [
+            [
+                "87b53226ebfe30a9"
+            ]
+        ]
+    },
+    {
+        "id": "87b53226ebfe30a9",
+        "type": "mongodb4",
+        "z": "9e5d9fa8c426baa4",
+        "clientNode": "4cad9b0ced29d7d1",
+        "mode": "collection",
+        "collection": "",
+        "operation": "",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "endpoints",
+        "x": 400,
+        "y": 2040,
+        "wires": [
+            [
+                "09b46a4cc95c77ef"
+            ]
+        ]
+    },
+    {
+        "id": "email",
+        "type": "e-mail",
+        "z": "9e5d9fa8c426baa4",
+        "server": "smtp.gmail.com",
+        "port": "587",
+        "authtype": "BASIC",
+        "saslformat": false,
+        "token": "oauth2Response.access_token",
+        "secure": false,
+        "tls": false,
+        "name": "lonelymanexpdoc@gmail.com",
+        "dname": "",
+        "x": 850,
+        "y": 2040,
+        "wires": []
+    },
+    {
+        "id": "xlsx",
+        "type": "xlsx",
+        "z": "9e5d9fa8c426baa4",
+        "name": "to excel",
+        "x": 300,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "09b46a4cc95c77ef",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "CSV send to Gmail",
+        "func": "let data = msg.payload;\nconst decode = (text) => {\n    try {\n        return decodeURIComponent(text);\n    } catch {\n        return text;\n    }\n}\n\nlet headers = [\n    \"MAC\", \"XWEB_NAME\", \"EXTERNAL_IP\", \"URL\",\n    \"OWNER\", \"BRANCH_ID\"\n];\n\nlet rows = data.map(item => [\n    item.mac_address,\n    decode(item.xweb_name),\n    item.external_ip,\n    item.url,\n    item.owner,\n    item.branch_id\n]);\n\nlet csv = [\n    headers.join(\",\"),\n    ...rows.map(r => r.map(v => `\"${v}\"`).join(\",\"))\n].join(\"\\n\");\ncsv = \"\\uFEFF\" + csv;\n\nlet buffer = Buffer.from(csv, \"utf-8\");\nmsg.attachments = [{\n    filename: \"ConfigurationsCJ.csv\", // ⚠️ ต้องเป็น csv\n    content: buffer\n}];\nmsg.payload = \"Configurations Report\";\nmsg.topic = \"ConfigurationsCJ\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 2040,
+        "wires": [
+            [
+                "email",
+                "a148fd98a0630175"
+            ]
+        ]
+    },
+    {
+        "id": "9372cbcce48c419e",
+        "type": "comment",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Configurations all send to mail",
+        "info": "",
+        "x": 380,
+        "y": 2000,
+        "wires": []
+    },
+    {
+        "id": "1f12d41a66ccdd4e",
+        "type": "e-mail",
+        "z": "9e5d9fa8c426baa4",
+        "server": "smtp.gmail.com",
+        "port": "587",
+        "authtype": "BASIC",
+        "saslformat": false,
+        "token": "oauth2Response.access_token",
+        "secure": false,
+        "tls": false,
+        "name": "onisuka.goodboy2@gmail.com",
+        "dname": "",
+        "x": 850,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "a148fd98a0630175",
+        "type": "debug",
+        "z": "9e5d9fa8c426baa4",
+        "name": "debug 16",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "234ad776b74eaf23",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "Inject AC2025 Alarms",
+        "func": "let xstream = global.get(\"xstream\")\nlet xalarms = global.get(\"xalarms\")\n\nconst keys = (obj) => Object.keys(obj)\nconst values = (obj) => Object.values(obj)\nconst entries = (obj) => Object.entries(obj)\n\nmsg.payload.errors = []\nlet { xactive={},errors = [] } = msg.payload\n// See On Start Too\nconst ipro_daikin_rules = context.iproDaikin || []\nvalues(xalarms).forEach(xweb => {\n    let { mac, devices, active_devices } = xweb\n    let { stream_data } = xstream[mac];\n    if (!stream_data) { errors.push({ reason: \"stream_data missing\", mac }); return; }\n    let { stream } = stream_data;\n    if (!stream) { errors.push({ reason: \"stream missing\", mac }); return; }\n    let { data, acq } = stream;\n    if (!data || !acq) { errors.push({ reason: \"data missing\", mac }); return; }\n\n    // CUSTOME AREA\n    entries(devices)\n        .forEach(([devk, devv]) => {\n            if (devv.alarm_rule !== \"ac2025\") return;\n            if (!acq) return;\n            // Cancel\n            // devv.virtual_alarms || (devv.virtual_alarms = {});\n            devv.active_alarms=[]\n            let { active_alarms, virtual_alarms } = devv\n            //custom\n            let dev_data = data[devk] || {};\n            dev_data && entries(devv.alarms).forEach(([pointId, point]) => {\n                point.error = 0\n                try {\n                    point.value = dev_data[pointId];\n                } catch {\n                    point.error = 1\n                    errors.push({ mac, devk, point })\n                }\n\n                let founded = ipro_daikin_rules.find(r => r.ids.includes(pointId));\n                if (founded !== undefined) {\n                    if (founded.ids[0] == pointId) {\n                        let vid = founded.id\n                        // Cancel\n                        // virtual_alarms[vid] = founded.getAlarm(dev_data)\n                        devv.alarms[vid] = founded.getAlarm(dev_data)\n                        devv.alarms[vid].en = 1\n                        devv.alarms[vid].value && active_alarms.push(vid)\n                    }\n                    point.en = 0;\n                } else {\n                    // Cancel\n                    // virtual_alarms[pointId] = point\n                    // virtual_alarms[pointId].value && (active.push(pointId))\n                    point.value = data[devk][pointId];\n                    point.en = 1;\n                    point.value && active_alarms.push(pointId)\n                }\n            })\n            // devv.active_alarms = active\n            active_alarms.length && active_devices.push(devk);\n        });\n    !xactive[mac] && (active_devices.length > 0) && (xactive[mac] = !0)\n})\ncontext.count = context.count+1\nlet date = new Date().toLocaleString(\"en-UK\", { timeZone: \"Asia/Bangkok\" }) \nnode.status({ fill: \"green\", shape: \"dot\", text:`${date} (${context.count})` });\n// DO NOT CHANGE OUTPUT\nmsg.payload = { xalarms, xactive, active_xwebs: keys(xactive), errors }\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "\n// Follow Document Name \"D3NET-Modbus Communication adaptor_Functional Specifications.pdf\"\nconst daikinValue2 = '0,A,C,E,H,F,J,L,P,U,9,8,7,6,5,4,3,2,1,G,K,M,N,R,T,V,W,X,Y,Z,*, '.split(',')\nconst orAlarms = (origins = []) => origins.reduce((p, v) => p && v, !0)\nconst getValue1 = (code) => (code!==undefined&&code<16?code.toString(16).toUpperCase():\"*\")||\"*\"\nconst getValue2 = (code) => daikinValue2[code] || \"*\"\nlet daikinAlarmCodeFile\ntry{\n    daikinAlarmCodeFile= fs.readFileSync(\"Daikin-Alarm-Codes.json\", 'utf8')\n}catch{\n    daikinAlarmCodeFile=\"{}\"\n}\nconst errorTable = JSON.parse(daikinAlarmCodeFile)||{};\nconst getCombineCode = (code1, code2=0) => {\n    let err_code = getValue2(code2) + getValue1(code1);\n    return err_code\n    // return errorTable[err_code]?.description || err_code\n}\n\nconst getAlarm = (data, conf) => {\n    if(!data) return{};\n    let { origins = [], params = {}, tpl } = conf\n    let { pid_code1, pid_code2} = params\n    return {\n        \"vudm\": null,\n        \"cwi\": null,\n        \"vn\": \"Virtual Alarm\",\n        \"vgrp\": 2,\n        \"vist\": 0,\n        \"t\": { \"alarm_notification\": [\"enabled\"] },\n        \"vfr\": 1,\n        \"error\": 0,\n        \"value\": !!(data[origins[0]]||0) || !!(data[origins[1]]||0),\n        \"name\": tpl.replace(\"CODE\", getCombineCode(\n            data[pid_code1],\n            data[pid_code2]\n        ))\n    }\n}\ncontext.iproDaikin = [\n    {\n        type: 'dakinAlarm',\n        id: '77.78',\n        ids: ['77', '78'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['77', '78'],\n            params: {\n                pid_code1: '53',\n                pid_code2: '54',\n            },\n            tpl:\"Air No.1 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '79.80',\n        ids: ['79', '80'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['79', '80'],\n            params: {\n                pid_code1: '55',\n                pid_code2: '56',\n            },\n            tpl: \"Air No.2 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '81.82',\n        ids: ['81', '82'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['81', '82'],\n            params: {\n                pid_code1: '57',\n                pid_code2: '58',\n            },\n            tpl: \"Air No.3 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '83.84',\n        ids: ['83', '84'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['83', '84'],\n            params: {\n                pid_code1: '59',\n                pid_code2: '60',\n            },\n            tpl: \"Air No.4 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '151.152',\n        ids: ['151', '152'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['151', '152'],\n            params: {\n                pid_code1: '147',\n                pid_code2: '148',\n            },\n            tpl: \"Air No.5 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '153.154',\n        ids: ['153', '154'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['153', '154'],\n            params: {\n                pid_code1: '149',\n                pid_code2: '150',\n            },\n            tpl: \"Air No.6 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '256.257',\n        ids: ['256', '257'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['256', '257'],\n            params: {\n                pid_code1: '252',\n                pid_code2: '253',\n            },\n            tpl: \"Air No.7 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '258.259',\n        ids: ['258', '259'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['258', '259'],\n            params: {\n                pid_code1: '254',\n                pid_code2: '255',\n            },\n            tpl: \"Air No.8 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '319.320',\n        ids: ['319', '320'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['319', '320'],\n            params: {\n                pid_code1: '351',\n                pid_code2: '352',\n            },\n            tpl: \"Air No.9 Alarm (CODE)\"\n        })\n    },\n    {\n        type: 'dakinAlarm',\n        id: '321.322',\n        ids: ['321', '322'],\n        getAlarm: (data) => getAlarm(data, {\n            origins: ['321', '322'],\n            params: {\n                pid_code1: '353',\n                pid_code2: '354',\n            },\n            tpl: \"Air No.10 Alarm (CODE)\"\n        })\n    },\n    \n]\ncontext.count=0",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "fs",
+                "module": "fs"
+            }
+        ],
+        "x": 1280,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0df4bcec30b4de4c",
+        "type": "function",
+        "z": "9e5d9fa8c426baa4",
+        "name": "XWEB Core",
+        "func": "\n// Safety Check: ตรวจสอบ Modules ---\nconst missingModules = [];\nif (typeof fetch === 'undefined') missingModules.push(\"fetch (node-fetch)\");\nif (typeof URL === 'undefined') missingModules.push(\"URL (url)\");\nif (typeof pLimit === 'undefined') missingModules.push(\"pLimit (p-limit)\");\nif (typeof AbortController === 'undefined') missingModules.push(\"AbortController (abort-controller)\");\nif (typeof https === 'undefined') missingModules.push(\"https (https)\");\n\nif (missingModules.length > 0) {\n    node.error(\"CRITICAL: Missing Modules in Setup tab: \" + missingModules.join(\", \"));\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Missing Modules! Check Debug\" });\n    return null;\n}\n\nconst n = msg.test ? !0 : !1\nlet now = Date.now();\n\nlet inititate = false\nconst setTopic = (topic) => msg.topic = topic\n\nconst xsysinfo = global.get(\"xsysinfo\") || {}\nconst xlogin = global.get(\"xlogin\") || {}\nconst xgetsetup = global.get(\"xgetsetup\") || {}\nconst xstream = global.get(\"xstream\") || {}\nconst xrefresh = global.get(\"xrefresh\") || {}\nconst xgetxj = global.get(\"xgetxj\") || {}\n\n// --- Safe Agent Access ---\nconst httpsAgent = global.xwebAgents?.https;\n\n// Handle Control Messages\nif (msg.action) {\n    if (msg.action === \"changeSetting\") {\n        let { requestFrequency, requestTimeout,\n            processesLimited, endpointConfigs, setEnableAll,\n            setGetsysinfoAll, setGetsetupAll } = msg.payload\n\n        if (requestFrequency) context.set(\"requestFrequency\", requestFrequency);\n        if (requestTimeout) context.set(\"requestTimeout\", requestTimeout);\n        if (processesLimited) context.set(\"processesLimited\", processesLimited);\n        if (endpointConfigs) context.set(\"endpointConfigs\", endpointConfigs);\n\n        requestFrequency = context.get(\"requestFrequency\");\n        requestTimeout = context.get(\"requestTimeout\");\n        processesLimited = context.get(\"processesLimited\");\n        endpointConfigs = context.get(\"endpointConfigs\");\n\n        if (setEnableAll) Object.values(context.get(\"threads\") || {}).forEach(t => t.enabled = true);\n        if (setGetsysinfoAll) Object.values(context.get(\"threads\") || {}).forEach(t => t.sysinfoIsRequired = true);\n        if (setGetsetupAll) Object.values(context.get(\"threads\") || {}).forEach(t => t.getsetupIsRequired = true);\n\n        msg.payload = { requestFrequency, requestTimeout, processesLimited, endpointConfigs };\n        setTopic(\"Change Setting\");\n    } else if (msg.action === \"start\") {\n        inititate = true;\n        msg.payload = { inititate };\n        setTopic(\"Initiate\");\n        context.set(\"running\", false);\n    }\n}\n\nif (!inititate && !context.get(\"running\")) {\n    if (!msg.action) {\n        inititate = true;\n    } else {\n        return msg;\n    }\n}\n\n// --- Limit Concurrency ---\nlet limitConfig = context.get(\"processesLimited\") || 20;\nlet processed_withLimited = pLimit(limitConfig);\n\nlet commonOptions = {\n    headers: { \"content-type\": \"application/x-www-form-urlencoded\" }\n};\n\nconst res2JSON = async (res) => {\n    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);\n    const text = await res.text();\n    try {\n        return JSON.parse(text);\n    } catch (e) {\n        throw new Error(\"Invalid JSON response\");\n    }\n}\n\nconst params2Body = (params) => new URL.URLSearchParams(params).toString();\nconst getAgent = (urlStr) => (urlStr && urlStr.startsWith(\"https\")) ? httpsAgent : null;\n\n// FIX Core: immutable update helper\nconst updateThread = (mac, patch) => {\n    let threads = context.get(\"threads\") || {};\n    let current = threads[mac] || {};\n\n    const updated = {\n        ...current,\n        ...patch\n    }\n    context.set(`threads.${mac}`, updated);\n    return updated;\n}\n/* safe get thread (cut reference) */\nconst getThread = (mac) => {\n    let thread = context.get(`threads.${mac}`);\n    if (!thread) {\n        thread = {\n            enabled: true,\n            getsetupIsRequired: true,\n            sysinfoIsRequired: true,\n            mac\n        };\n        context.set(`threads.${mac}`, thread);\n    }\n    // Fix: return copy protected of mutation\n    return { ...thread };\n}\nconst ensureStore = (store, mac) => {\n    if (!store[mac]) store[mac] = {};\n    return store[mac];\n}\n// shallow clone\nconst safeEndpoint = (e) => ({\n    mac: e.mac,\n    host: e.host,\n    urls: { ...e.urls },\n    auth: { ...e.auth }\n});\n\nconst timelapse = () => (Date.now() - now) / 1000;\n\nconst statusWithTs = (result, mac, part, host) => {\n    // context.completeds = (context.completeds || 0) + 1;\n    if (result !== \"ok\") {\n        context.err = (context.err || 0) + 1;\n        node.send({ payload: { result, mac, part, host }, topic: \"Return Status\" });\n    }\n    // node.status({ fill: \"yellow\", shape: \"dot\", text: `Running ${context.completeds}/${context.total || 0} err:${context.err || 0}` });\n    return { mac, part, result, host, secs: timelapse() };\n}\n\nconst createTimeoutController = () => {\n    let controller = new AbortController();\n    const timeoutId = setTimeout(() => controller.abort(), context.get(\"requestTimeout\"));\n    return { signal: controller.signal, timeoutId };\n}\n\nconst safeClone = (obj) => {\n    try {\n        return JSON.parse(JSON.stringify(obj));\n    } catch {\n        return {};\n    }\n}\n\nconst shallowCopy = (obj) => ({ ...obj });\n\nconst sysInfoOnData = (currentContext, endpointConfig) => (data) => {\n    let { mac } = currentContext;\n    let store = ensureStore(xsysinfo, mac);\n    const { timestamp: _ts, info, ...restData } = data || {};\n    let cleanInfo = info ? (({ languages, ...r }) => r)(info) : undefined;\n\n    store.sysinfo_data = {\n        mac,\n        ts: Date.now(),\n        ...restData,\n        ...(cleanInfo && { info: cleanInfo })\n    };\n    delete currentContext.sysinfo_err;\n    delete store.sysinfo_err;\n    data = null;\n\n    n && node.send({ payload: store.sysinfo_data, topic: \"sysinfo\" });\n\n    if (store.sysinfo_data.error === \"PERMISSION_DENIED\") return false;\n    updateThread(mac, { sysinfoIsRequired: false });\n    return true;\n}\n\nconst getsetupOnData = (currentContext, endpointConfig) => async (data) => {\n    let { mac } = currentContext;\n    let { host } = endpointConfig;\n\n    let store = ensureStore(xgetsetup, mac);\n    const { alarmCategories: _ac, maps: _maps, dpu: _dpu, devices, ...restSetup } = data || {};\n\n    let cleanDevices = undefined;\n    if (devices) {\n        cleanDevices = {};\n        for (const [devKey, devVal] of Object.entries(devices)) {\n            if (!devVal) continue;\n\n            const { cmds: _cmds, lng, gen, vrs, ...restDev } = devVal;\n\n            let cleanLng = undefined;\n            if (lng) {\n                const { cmds: _lngCmds, ...restLng } = lng;\n                cleanLng = restLng;\n            }\n\n            let cleanGen = undefined;\n            if (gen) {\n                const { devcom: _dc, dixelldev: _dd, dstp: _ds, desc: _desc, ...restGen } = gen;\n                cleanGen = restGen;\n            }\n\n            let cleanVrs = undefined;\n            if (vrs) {\n                cleanVrs = {};\n                for (const [vrsKey, vrsVal] of Object.entries(vrs)) {\n                    if (!vrsVal) continue;\n                    const { cwi: _cwi, chartDef, ...restVrsVal } = vrsVal;\n\n                    let cleanChartDef = undefined;\n                    if (chartDef) {\n                        const { color: _color, ...restChartDef } = chartDef;\n                        cleanChartDef = restChartDef;\n                    }\n\n                    cleanVrs[vrsKey] = {\n                        ...restVrsVal,\n                        ...(cleanChartDef && { chartDef: cleanChartDef })\n                    };\n                }\n            }\n\n            cleanDevices[devKey] = {\n                ...restDev,\n                ...(cleanLng && { lng: cleanLng }),\n                ...(cleanGen && { gen: cleanGen }),\n                ...(cleanVrs && { vrs: cleanVrs })\n            };\n        }\n    }\n\n    store.setup_data = {\n        mac,\n        ts: Date.now(),\n        ...shallowCopy(restSetup),\n        ...(cleanDevices && { devices: safeClone(cleanDevices) })\n    };\n\n    delete currentContext.setup_err;\n    delete store?.setup_err;\n\n    let hasError = data.error;\n    data = null;\n    cleanDevices = null;\n\n    n && node.send({ payload: \"setup processed\", topic: \"getsetup\" });\n\n    if (hasError === \"PERMISSION_DENIED\") {\n        return await login(endpointConfig, getsetup);\n    }\n\n    updateThread(mac, { getsetupIsRequired: false });\n    return statusWithTs(\"ok\", mac, \"getsetup\", host);\n}\n\nconst streamOnData = (currentContext, endpointConfig) => async (data) => {\n    let { mac } = currentContext;\n    let { host } = endpointConfig;\n\n    let store = ensureStore(xstream, mac);\n\n    // Filter: stream.inputs, stream.outputs\n    const { stream: streamData, ...restData } = data || {};\n    let cleanStream = streamData ? (({ inputs, outputs, ...r }) => r)(streamData) : undefined;\n\n    store.stream_data = {\n        mac, ts: Date.now(), ...shallowCopy(restData), ...(cleanStream && { stream: safeClone(cleanStream) })\n    };\n\n    delete currentContext.stream_err;\n    delete store?.stream_err;\n    data = null;\n\n    n && node.send({ payload: \"stream processed\", topic: \"stream\" });\n    let freshContext = context.get(`threads.${mac}`) || currentContext;\n\n    if (store.stream_data) {\n        let sData = xstream[mac].stream_data;\n        if (freshContext.sysinfoIsRequired) await sysinfo(endpointConfig);\n\n        if (sData.error === \"PERMISSION_DENIED\") {\n            delete xlogin[mac]?.login_data?.user?.sses;\n            return await login(endpointConfig);\n        } else if (sData.status === \"ok\") {\n            // --- [CUT] Alarms removed here ---\n            if (freshContext.getsetupIsRequired) return await getsetup(endpointConfig);\n\n            let result = await login(endpointConfig, null, \"refresh\");\n            if (result.result === \"ok\") {\n                result.part = \"stream+refresh\";\n                return result;\n            }\n            return statusWithTs(\"ok\", mac, \"stream\", host);\n        }\n    }\n    return statusWithTs(\"error\", mac, \"stream.unknown\", host);\n}\n\nconst loginOnData = (currentContext, callback, endpointConfig, action, retryCount = 0) => async (data) => {\n    let { mac } = currentContext;\n    let { host } = endpointConfig;\n    n && node.send({ payload: \"login response\", topic: \"login\" });\n\n    let store = ensureStore(xlogin, mac);\n\n    // Filter: layout, user(devices, desktops, permissions, chart)\n    const { layout: _layout, user, ...restLogin } = data || {};\n    let cleanUser = user ? (({ devices, desktops, permissions, chart, ...r }) => r)(user) : undefined;\n\n    const cleanedData = { mac, ts: Date.now(), ...restLogin, ...(cleanUser && { user: cleanUser }) };\n\n    if (action) store[`login_${action}_data`] = cleanedData;\n    else store.login_data = cleanedData;\n\n    delete currentContext.login_err;\n    delete store.login_err;\n\n    let status = data.status;\n    data = null;\n\n    if (status !== \"ok\") {\n        store.login_err = { mac, ts: Date.now(), status };\n\n        // --- XJ Logic ---\n        let xj = await getXj(endpointConfig);\n        n && node.send({ payload: xj, topic: \"XJPasswd\" });\n        if (xj) {\n            endpointConfig.auth.username = \"Administrator\";\n            endpointConfig.auth.password = xj.trim();\n            let res = await login(endpointConfig, callback, action, retryCount + 1);\n            if (res.result === \"error\") {\n                res.part = \"login.xj.invalid\";\n            }\n            n && node.send({ payload: { res } });\n            return res;\n        } else {\n            return statusWithTs(\"error\", mac, \"login.xj\", host);\n        }\n    } else {\n        if (typeof callback === 'function') return await callback(endpointConfig, retryCount + 1);\n        return statusWithTs(\"ok\", mac, \"login\");\n    }\n}\n\n// --- Fetch Functions ---\n\nconst sysinfo = (endpointConfig) => {\n    let { mac, host, urls } = endpointConfig;\n    let currentContext = getThread(mac);\n    if (!currentContext.enabled) return Promise.resolve(statusWithTs(\"blocked\", mac, \"sysinfo disabled\", host));\n\n    let controller = createTimeoutController();\n    return fetch(urls.sysinfo, { method: \"GET\", ...commonOptions, signal: controller.signal, agent: getAgent(urls.sysinfo) })\n        .then(res2JSON).then(sysInfoOnData(currentContext, endpointConfig))\n        .catch(err => {\n            xsysinfo[mac].sysinfo_err = { mac, ts: Date.now(), error: err.message };\n            return statusWithTs(\"error\", mac, \"sysinfo\", host);\n        }).finally(() => clearTimeout(controller.timeoutId));\n}\n\nconst getsetup = (endpointConfig) => {\n    let { mac, host, urls } = endpointConfig;\n    let currentContext = getThread(mac);\n    if (!currentContext.enabled) return Promise.resolve(statusWithTs(\"blocked\", mac, \"getsetup disabled\", host));\n\n    let { login_data = {} } = xlogin[mac], { user = {} } = login_data, { sses } = user;\n    if (!sses) return login(endpointConfig, getsetup);\n\n    let controller = createTimeoutController();\n    return fetch(urls.getsetup, {\n        method: \"POST\", body: params2Body({ SSES: sses, language: \"en-GB\" }),\n        ...commonOptions, signal: controller.signal, agent: getAgent(urls.getsetup)\n    })\n        .then(res2JSON).then(getsetupOnData(currentContext, endpointConfig))\n        .catch(err => {\n            xgetsetup[mac].setup_err = { mac, ts: Date.now(), error: err.message };\n            return statusWithTs(\"error\", mac, \"getsetup\", host);\n        }).finally(() => clearTimeout(controller.timeoutId));\n}\n\nconst xjEndpoint = \"http://lotus.snapx.cloud/api/v1/xjpasswd\"\nconst getXj = (endpointConfig) => {\n    let { mac } = endpointConfig;\n    let currentContext = getThread(mac);\n    let controller = createTimeoutController();\n    return fetch(xjEndpoint + `?MAC=${mac.toUpperCase()}`, {\n        method: \"GET\", ...commonOptions, signal: controller.signal,\n        agent: getAgent(xjEndpoint)\n    })\n        .then(res => res.text())\n        .then(data => {\n            delete currentContext.xj_err;\n            delete xgetxj[mac].xj_err;\n            xgetxj[mac].xj_data = { mac, ts: Date.now(), ...shallowCopy(data) };\n            return data;\n        })\n        .catch(err => {\n            xgetxj[mac].xj_err = { mac, ts: Date.now(), ...err };\n            n && node.send({ payload: err, topic: \"xj\" });\n            return null;\n        }).finally(() => clearTimeout(controller.timeoutId));\n}\n\nconst stream = (endpointConfig) => {\n    let { mac, host, urls } = endpointConfig;\n    let currentContext = getThread(mac);\n    if (!currentContext.enabled) return Promise.resolve(statusWithTs(\"blocked\", mac, \"stream disabled\", host));\n\n    let { login_data = {} } = xlogin[mac], { user = {} } = login_data, { sses } = user;\n    if (!sses) return login(endpointConfig);\n\n    let controller = createTimeoutController();\n    return fetch(urls.stream, {\n        method: \"POST\", body: params2Body({ SSES: sses, complete: 1 }),\n        ...commonOptions, signal: controller.signal, agent: getAgent(urls.stream)\n    })\n        .then(res2JSON).then(streamOnData(currentContext, endpointConfig))\n        .catch(err => {\n            xstream[mac].stream_err = { mac, ts: Date.now(), error: err.message };\n            if (err.message === \"PERMISSION_DENIED\" || err.message.includes(\"Invalid JSON\")) return login(endpointConfig);\n            return statusWithTs(\"timeout\", mac, \"stream timeout\", host);\n        }).finally(() => clearTimeout(controller.timeoutId));\n}\n\nconst login = (endpointConfig, callback, action, retryCount = 0) => {\n    let { mac, host, urls, auth } = endpointConfig;\n    let currentContext = getThread(mac);\n\n    if (retryCount > 2) {\n        return Promise.resolve(statusWithTs(\"error\", mac, \"login_loop\", host));\n    }\n\n    if (!currentContext.enabled) return Promise.resolve(statusWithTs(\"blocked\", mac, \"login disabled\", host));\n\n    let params = { action: action || \"login\", auth_mode: auth.auth_mode, username: auth.username, password: auth.password, initparam: -1 };\n    if (action === \"refresh\") {\n        let { login_data = {} } = xlogin[mac], { user = {} } = login_data, { sses } = user;\n        params.SSES = sses;\n    }\n\n    let controller = createTimeoutController();\n    return fetch(urls.login, {\n        method: \"POST\", body: params2Body(params),\n        ...commonOptions, signal: controller.signal, agent: getAgent(urls.login)\n    })\n        .then(res2JSON).then(loginOnData(currentContext, callback, endpointConfig, action, retryCount))\n        .catch(err => {\n            xlogin[mac].login_err = { mac, ts: Date.now(), error: err.message };\n            if (!action) return statusWithTs(\"error\", mac, \"login\", host);\n            return statusWithTs(\"error\", mac, \"login\", host);\n        }).finally(() => clearTimeout(controller.timeoutId));\n}\n\n// --- Main Execution ---\nlet auth = { auth_mode: \"standard\", username: \"request\", password: \"027220245s\" };\nlet mac = \"000AF61469BD\";\nlet url = \"http://9.1.0.7:50007/\";\nlet urls = {\n    sysinfo: url + \"cgi-bin/sysinfo.lua\",\n    login: url + \"cgi-bin/login.lua\",\n    stream: url + \"cgi-bin/stream.lua\",\n    getsetup: url + \"cgi-bin/getsetup.lua\",\n    // alarms: url + \"cgi-bin/alarms.lua\" <--- [REMOVED]\n};\nlet endpointConfig = { mac, urls, auth };\nlet test = msg.test ? [endpointConfig] : null;\n\nif (context.get(\"enabled\") && !context.get(\"running\")) {\n    context.set(\"running\", true);\n    let endpointConfigs = test || context.get(\"endpointConfigs\") || [];\n\n    if (endpointConfigs.length === 0) {\n        context.set(\"running\", false);\n        node.status({ fill: \"blue\", shape: \"ring\", text: \"No configs\" });\n        return msg;\n    }\n\n    context.completeds = 0; context.err = 0; context.total = endpointConfigs.length;\n    node.send(msg);\n\n    {/* BUILD BACKLOG NEW (Safe structure */ }\n    let backlogs = {};\n    endpointConfigs.forEach(e => {\n        backlogs[e.mac] = {\n            mac: e.mac,\n            host: e.host,\n            status: \"pending\",\n            lastUpdate: Date.now(),\n        };\n        if (!xsysinfo[e.mac]) xsysinfo[e.mac] = {};\n        if (!xlogin[e.mac]) xlogin[e.mac] = {};\n        if (!xgetsetup[e.mac]) xgetsetup[e.mac] = {};\n        if (!xstream[e.mac]) xstream[e.mac] = {};\n        if (!xgetxj[e.mac]) xgetxj[e.mac] = {};\n    });\n    flow.set(\"backlogs\", { ...backlogs });\n\n    const tasks = endpointConfigs.map((endpointConfig) => processed_withLimited(() => {\n        const ep = safeEndpoint(endpointConfig);\n        return stream(ep).then((result) => {\n            context.completeds = (context.completeds || 0) + 1;\n            node.status({ fill: \"yellow\", shape: \"dot\", text: `Running ${context.completeds}/${context.total} err:${context.err || 0}` });\n            return result;\n        })\n    }))\n\n    Promise.allSettled(tasks).then((results) => {\n        let totalSecs = (Date.now() - now) / 1000;\n        let fulfilleds = results.filter(r => r.status === \"fulfilled\");\n        let successes = fulfilleds.filter(r => r.value && r.value.result === \"ok\");\n        let fails = fulfilleds.filter(r => r.value && r.value.result === \"error\");\n\n        const resMap = (r) => (r.value ? [r.value.host, r.value.mac, r.value.result, r.value.secs] : [\"err\", \"err\", \"crash\", 0]);\n\n        let currentBacklogs = flow.get(\"backlogs\") || {};\n        // ==== safe backlog load & ป้องกัน reference ====//\n        currentBacklogs = JSON.parse(JSON.stringify(currentBacklogs));\n        endpointConfigs.forEach(e => delete currentBacklogs[e.mac]);\n\n        context.set(\"running\", false);\n        node.send([, { payload: { totalSecs, successes: successes.map(resMap), fails: fails.map(resMap) } }]);\n        node.status({ fill: \"green\", shape: \"dot\", text: `Completed ${context.completeds}/${context.total}` });\n    }).catch(err => {\n        context.set(\"running\", false);\n        node.error(\"Critical Error in Main Loop: \" + err.message);\n        node.status({ fill: \"red\", shape: \"ring\", text: \"Crash Recovered\" });\n    });\n\n} else {\n    if (context.get(\"running\")) {\n        node.status({ fill: \"yellow\", shape: \"ring\", text: `Busy...` });\n    } else {\n        node.status({ fill: \"red\", shape: \"dot\", text: `Disabled` });\n    }\n    msg.payload = { ...msg.payload, blocked: true };\n    return msg;\n}",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\nglobal.get(\"xsysinfo\") || global.set(\"xsysinfo\", {})\nglobal.get(\"xlogin\") || global.set(\"xlogin\", {})\nglobal.get(\"xgetsetup\") || global.set(\"xgetsetup\", {})\nglobal.get(\"xstream\") || global.set(\"xstream\", {})\nglobal.get(\"xrefresh\") || global.set(\"xrefresh\", {})\nglobal.get(\"xgetxj\") || global.set(\"xgetxj\", {})\n\ncontext.get(\"threads\") || context.set(\"threads\", {});\ncontext.get(\"enabled\") || context.set(\"enabled\", false);\n\ncontext.get(\"requestFrequency\") || context.set(\"requestFrequency\", 180000); //3 minutes\ncontext.get(\"processesLimited\") || context.set(\"processesLimited\", 20);\ncontext.get(\"requestTimeout\") || context.set(\"requestTimeout\", 20000);\ncontext.get(\"endpointConfigs\") || context.set(\"endpointConfigs\", []);\ncontext.get(\"running\") || context.set(\"running\", false);\ncontext.get(\"timing\") || context.set(\"timing\", {});\ncontext.completeds !== undefined || (context.completeds = 0);\ncontext.total !== undefined || (context.total = 0);\n\n// --- Safe Agent Creation ---\nif (!global.xwebAgents) {\n    try {\n        // const agentOptions = { keepAlive: true, keepAliveMsecs: 3000, maxSockets: 100, maxFreeSocket: 10, timeout: 60000 };\n        const agentOptions = { keepAlive: false };\n\n        global.xwebAgents = {\n            https: new https.Agent({ ...agentOptions, rejectUnauthorized: false })\n        };\n    } catch (e) {\n        node.error(\"Failed to create HTTPS Agent: \" + e.message);\n    }\n}\n\n//Test\ncontext.set(\"enabled\", true);\ncontext.set(\"running\", false);\nnode.status({ fill: \"green\", shape: \"dot\", text: `Ready` });",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "fetch",
+                "module": "node-fetch"
+            },
+            {
+                "var": "URL",
+                "module": "url"
+            },
+            {
+                "var": "pLimit",
+                "module": "p-limit"
+            },
+            {
+                "var": "AbortController",
+                "module": "abort-controller"
+            },
+            {
+                "var": "https",
+                "module": "https"
+            }
+        ],
+        "x": 450,
+        "y": 300,
+        "wires": [
+            [],
+            [
+                "eb6c5756657ab1bc",
+                "0f7a334dd21799b1"
+            ]
+        ],
+        "inputLabels": [
+            "actions"
+        ],
+        "outputLabels": [
+            "",
+            "Process Results"
+        ]
+    },
+    {
+        "id": "4cad9b0ced29d7d1",
+        "type": "mongodb4-client",
+        "name": "cj-core",
+        "protocol": "mongodb+srv",
+        "hostname": "cluster-test.teaxzne.mongodb.net",
+        "port": "",
+        "dbName": "cj-core",
+        "appName": "Cluster-test",
+        "authSource": "",
+        "authMechanism": "MONGODB-X509",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "/home/watpnas/X509-cert-590808797613905362.pem",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "150",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    }
+]
